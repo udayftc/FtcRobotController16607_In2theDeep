@@ -1,6 +1,11 @@
 package teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -19,14 +24,19 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
     private DcMotor Frontleft;
     private DcMotor Backleft;
     private DcMotor Backright;
+    private IMU imu;
 
     private Servo Test;
     private Servo Drone;
     private Servo Servoarm;
     static final double INCREMENT = 0.01;
-    static final int    CYCLE_MS  =   50;
-    static final double MAX_FWD   =  1.0;
-    static final double MAX_REV   = -1.0;
+    static final int CYCLE_MS = 50;
+    static final double MAX_FWD = 1.0;
+    static final double MAX_REV = -1.0;
+
+    RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
+    RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
+    RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
     int cp = 0;
     double power = 0;
@@ -42,6 +52,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
         Frontleft = hardwareMap.get(DcMotor.class, "Frontleft");
         Frontright = hardwareMap.get(DcMotor.class, "Frontright");
         Hook = hardwareMap.get(DcMotor.class, "Hook");
+        imu = hardwareMap.get(IMU.class, "imu");
         Hook.setDirection(DcMotorSimple.Direction.REVERSE);
         Hook.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -71,6 +82,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
         Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.update();
     }
+
     public void Mecanumdrive() {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -87,6 +99,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
         Backleft.setPower(v3);
         Backright.setPower(v4);
     }
+
     public void AllMotorsFrwrd() {
         tgtPower = gamepad1.left_stick_y;
         Backleft.setPower(tgtPower);
@@ -97,6 +110,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
         telemetry.addData("Status", "Motors");
         telemetry.update();
     }
+
     public void run_to_position_FL() {
         int tgtPosition = 8000;
         cp = -1 * Frontleft.getCurrentPosition();
@@ -109,9 +123,11 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("DcMotor PositionFL:", Frontleft.getCurrentPosition());
             telemetry.addData("cp", cp);
             telemetry.update();
-        } Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Frontleft.setPower(0);
     }
+
     public void run_to_position_FR() {
         int tgtPosition = 8000;
         cp = -1 * Frontright.getCurrentPosition();
@@ -124,9 +140,11 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("DcMotor PositionFR:", Frontright.getCurrentPosition());
             telemetry.addData("cp", cp);
             telemetry.update();
-        } Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Frontright.setPower(0);
     }
+
     public void run_to_position_BL() {
         int tgtPosition = 8000;
         cp = -1 * Backleft.getCurrentPosition();
@@ -139,9 +157,11 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("DcMotor PositionBL:", Backleft.getCurrentPosition());
             telemetry.addData("cp", cp);
             telemetry.update();
-        } Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Backleft.setPower(0);
     }
+
     public void run_to_position_BR() {
         int tgtPosition = 8000;
         cp = -1 * Backright.getCurrentPosition();
@@ -154,9 +174,15 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("DcMotor PositionBR:", Backright.getCurrentPosition());
             telemetry.addData("cp", cp);
             telemetry.update();
-        } Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Backright.setPower(0);
     }
+
+    public void Hook_Zero_Pwr_Behavior() {
+        Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
     public void run_to_position_FLRBLR() {
         if (gamepad1.a) {
             run_to_position_FL();
@@ -168,6 +194,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             run_to_position_BR();
         }
     }
+
     public void ladder_run_to_position0() {
         int tgt0Position = 6;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -179,6 +206,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
         }
     }
+
     public void ladder_run_to_position1() {
         int tgt1Position = 150;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -190,6 +218,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
         }
     }
+
     public void ladder_run_to_position2() {
         int tgt2Position = 300;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -201,6 +230,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
         }
     }
+
     public void ladder_run_to_position3() {
         int tgt3Position = 600;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -212,6 +242,7 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
         }
     }
+
     public void hook_run_to_high_position() {
         int tgthPosition = 8400;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -223,7 +254,8 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
         }
     }
-    public void hook_run_to_lowest_position() {
+
+    public void hook_run_to_zero_position() {
         int tgthlPosition = 40;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Hook.setTargetPosition(tgthlPosition);
@@ -233,18 +265,19 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("Hook Pos:", Hook.getCurrentPosition());
             telemetry.update();
         }
+        Hook_Zero_Pwr_Behavior();
     }
 
-
     @Override
-    public void runOpMode () {
+    public void runOpMode() {
 
-        /** imu = hardwareMap.get(Gyroscope.class, "imu");
-        digitalTouch = hardwareMap.get(DigitalChannel.class, "digitalTouch");
-        sensorColorRange = hardwareMap.get(DistanceSensor.class, "sensorColorRange");
-        */
+        /* imu = hardwareMap.get(Gyroscope.class, "imu");
+         digitalTouch = hardwareMap.get(DigitalChannel.class, "digitalTouch");
+         sensorColorRange = hardwareMap.get(DistanceSensor.class, "sensorColorRange");
+         */
 
         init_motors();
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -254,32 +287,52 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
 
             Mecanumdrive();
 
-            /** servo open and close and positions */
+            telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
+            // Check to see if heading reset is requested
+            if (gamepad1.y) {
+                    telemetry.addData("Yaw", "Resetting\n");
+                    imu.resetYaw();
+            } else {
+                    telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
+            }
 
-            if (gamepad2.a) {
+            // Retrieve Rotational Angles and Velocities
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
+            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
+            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
+            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
+            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
+            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
+            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
+            telemetry.update();
+
+            /* servo open and close and positions */
+
+            if (gamepad1.dpad_left) {
                 Test.setPosition(0);
-            } else if (gamepad2.b) {
+            } else if (gamepad1.dpad_right) {
                 Test.setPosition(1);
             }
-            if (gamepad2.x) {
+            if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
-            } else if (gamepad2.y) {
+            } else if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
             }
 
-            /** LadderLift positions */
+            /* LadderLift positions */
 
-            if (gamepad2.dpad_down) {
+            if (gamepad2.a) {
                 ladder_run_to_position0();
-            } else if (gamepad2.dpad_left) {
+            } else if (gamepad2.x) {
                 ladder_run_to_position1();
-            } else if (gamepad2.dpad_right) {
+            } else if (gamepad2.b) {
                 ladder_run_to_position2();
-            } else if (gamepad2.dpad_up) {
+            } else if (gamepad2.y) {
                 ladder_run_to_position3();
             }
 
-            /** Drone Positions */
+            /* Drone Positions */
 
             if (gamepad2.left_bumper) {
                 Drone.setPosition(0);
@@ -287,15 +340,16 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
                 Drone.setPosition(1);
             }
 
-            /** Hook Positions */
+            /* Hook Positions */
 
             if (gamepad1.dpad_up) {
                 hook_run_to_high_position();
             } else if (gamepad1.dpad_down) {
-                hook_run_to_lowest_position();
+                hook_run_to_zero_position();
             }
 
         }
+    }
 
           /*  if (rampUp) {
                 // Keep stepping up until we hit the max value.
@@ -334,7 +388,8 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.update();
 */
 
-        }
     }
+
+
 
 
