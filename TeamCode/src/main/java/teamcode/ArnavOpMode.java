@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-public class ArnavOpModeDCMotor extends LinearOpMode {
+public class ArnavOpMode extends LinearOpMode {
 
     //private Gyroscope imu;
     //private DigitalChannel digitalTouch;
@@ -29,19 +29,19 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
     private Servo Test;
     private Servo Drone;
     private Servo Servoarm;
-    static final double INCREMENT = 0.01;
-    static final int CYCLE_MS = 50;
-    static final double MAX_FWD = 1.0;
-    static final double MAX_REV = -1.0;
+    //static final double INCREMENT = 0.01;
+    //static final int CYCLE_MS = 50;
+    //static final double MAX_FWD = 1.0;
+    //static final double MAX_REV = -1.0;
 
     RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
     RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
     RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
-    int cp = 0;
-    double power = 0;
-    double tgtPower = 0;
-    boolean rampUp = true;
+    //int cp = 0;
+    //double power = 0;
+    //double tgtPower = 0;
+    //boolean rampUp = true;
 
     public void init_motors() {
         Test = hardwareMap.get(Servo.class, "Test");
@@ -216,20 +216,23 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
             telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
             telemetry.update();
 
-            /* servo open and close and positions */
+            /* servo open and close and positions */ /* Hook Positions */
 
             if (gamepad1.dpad_left) {
                 Test.setPosition(0);
             } else if (gamepad1.dpad_right) {
                 Test.setPosition(1);
-            }
-            if (gamepad1.left_bumper) {
+            } else if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
             } else if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
+            } else if (gamepad1.dpad_up) {
+                hook_run_to_high_position();
+            } else if (gamepad1.dpad_down) {
+                hook_run_to_zero_position();
             }
 
-            /* LadderLift positions */
+            /* LadderLift positions */ /* Drone Positions */
 
             if (gamepad2.a) {
                 ladder_run_to_position0();
@@ -239,28 +242,14 @@ public class ArnavOpModeDCMotor extends LinearOpMode {
                 ladder_run_to_position2();
             } else if (gamepad2.y) {
                 ladder_run_to_position3();
-            }
-
-            /* Drone Positions */
-
-            if (gamepad2.left_bumper) {
+            } else if (gamepad2.left_bumper) {
                 Drone.setPosition(0);
             } else if (gamepad2.right_bumper) {
                 Drone.setPosition(1);
             }
 
-            /* Hook Positions */
-
-            if (gamepad1.dpad_up) {
-                hook_run_to_high_position();
-            } else if (gamepad1.dpad_down) {
-                hook_run_to_zero_position();
-            }
-
         }
     }
-
-
 
           /*  if (rampUp) {
                 // Keep stepping up until we hit the max value.

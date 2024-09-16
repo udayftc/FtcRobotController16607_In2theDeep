@@ -183,18 +183,6 @@ public class TestOpMode extends LinearOpMode {
         Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void run_to_position_FLRBLR() {
-        if (gamepad1.a) {
-            run_to_position_FL();
-        } else if (gamepad1.b) {
-            run_to_position_FR();
-        } else if (gamepad1.x) {
-            run_to_position_BL();
-        } else if (gamepad1.y) {
-            run_to_position_BR();
-        }
-    }
-
     public void ladder_run_to_position0() {
         int tgt0Position = 6;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -312,11 +300,18 @@ public class TestOpMode extends LinearOpMode {
                 Test.setPosition(0);
             } else if (gamepad1.dpad_right) {
                 Test.setPosition(1);
-            }
-            if (gamepad1.left_bumper) {
+            } else if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
             } else if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
+            } else if (gamepad1.a) {
+                run_to_position_FL();
+            } else if (gamepad1.b) {
+                run_to_position_FR();
+            } else if (gamepad1.x) {
+                run_to_position_BL();
+            } else if (gamepad1.y) {
+                run_to_position_BR();
             }
 
             /* LadderLift positions */
