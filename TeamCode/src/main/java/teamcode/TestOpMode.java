@@ -29,19 +29,19 @@ public class TestOpMode extends LinearOpMode {
     private Servo Test;
     private Servo Drone;
     private Servo Servoarm;
-    static final double INCREMENT = 0.01;
-    static final int CYCLE_MS = 50;
-    static final double MAX_FWD = 1.0;
-    static final double MAX_REV = -1.0;
+    //static final double INCREMENT = 0.01;
+    //static final int CYCLE_MS = 50;
+    //static final double MAX_FWD = 1.0;
+    //static final double MAX_REV = -1.0;
 
     RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
     RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
     RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
     int cp = 0;
-    double power = 0;
+    //double power = 0;
     double tgtPower = 0;
-    boolean rampUp = true;
+    //boolean rampUp = true;
 
     public void init_motors() {
         Test = hardwareMap.get(Servo.class, "Test");
@@ -83,7 +83,7 @@ public class TestOpMode extends LinearOpMode {
         telemetry.update();
     }
 
-    public void Mecanumdrive() {
+   /* public void Mecanumdrive() {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
         double h = Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
@@ -98,7 +98,7 @@ public class TestOpMode extends LinearOpMode {
         Frontright.setPower(v2);
         Backleft.setPower(v3);
         Backright.setPower(v4);
-    }
+    }*/
 
     public void AllMotorsFrwrd() {
         tgtPower = gamepad1.left_stick_y;
