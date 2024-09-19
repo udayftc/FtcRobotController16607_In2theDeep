@@ -1,8 +1,6 @@
 package teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
-import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -24,24 +22,10 @@ public class ArnavOpMode extends LinearOpMode {
     private DcMotor Frontleft;
     private DcMotor Backleft;
     private DcMotor Backright;
-    IMU imu;
 
     private Servo Test;
     private Servo Drone;
     private Servo Servoarm;
-    //static final double INCREMENT = 0.01;
-    //static final int CYCLE_MS = 50;
-    //static final double MAX_FWD = 1.0;
-    //static final double MAX_REV = -1.0;
-
-    RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-    RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-    RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
-
-    //int cp = 0;
-    //double power = 0;
-    //double tgtPower = 0;
-    //boolean rampUp = true;
 
     public void init_motors() {
         Test = hardwareMap.get(Servo.class, "Test");
@@ -185,8 +169,6 @@ public class ArnavOpMode extends LinearOpMode {
          */
 
         init_motors();
-        imu = hardwareMap.get(IMU.class, "imu");
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -195,26 +177,6 @@ public class ArnavOpMode extends LinearOpMode {
         while (opModeIsActive()) {
 
             Mecanumdrive();
-
-            telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
-            // Check to see if heading reset is requested
-            if (gamepad1.y) {
-                    telemetry.addData("Yaw", "Resetting\n");
-                    imu.resetYaw();
-            } else {
-                    telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
-            }
-
-            // Retrieve Rotational Angles and Velocities
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
-            telemetry.update();
 
             /* servo open and close and positions */ /* Hook Positions */
 
