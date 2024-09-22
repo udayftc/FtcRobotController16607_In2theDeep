@@ -83,6 +83,110 @@ public class ArnavOpMode extends LinearOpMode {
         Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.update();
     }
+    public void init_LL() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
+        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
+        limelight.start();
+    }
+    public void run_LL() {
+        LLStatus status = limelight.getStatus();
+        telemetry.addData("Name", "%s",
+                status.getName());
+        telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
+                status.getTemp(), status.getCpu(),(int)status.getFps());
+        telemetry.addData("Pipeline", "Index: %d, Type: %s",
+                status.getPipelineIndex(), status.getPipelineType());
+
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            // Access general information
+            Pose3D botpose = result.getBotpose();
+            double captureLatency = result.getCaptureLatency();
+            double targetingLatency = result.getTargetingLatency();
+            double parseLatency = result.getParseLatency();
+            telemetry.addData("LL Latency", captureLatency + targetingLatency);
+            telemetry.addData("Parse Latency", parseLatency);
+            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+
+            if (result.isValid()) {
+                telemetry.addData("tx", result.getTx());
+                telemetry.addData("txnc", result.getTxNC());
+                telemetry.addData("ty", result.getTy());
+                telemetry.addData("tync", result.getTyNC());
+
+                telemetry.addData("Botpose", botpose.toString());
+
+                // Access barcode results
+                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+                for (LLResultTypes.BarcodeResult br : barcodeResults) {
+                    telemetry.addData("Barcode", "Data: %s", br.getData());
+                }
+
+                // Access classifier results
+                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
+                for (LLResultTypes.ClassifierResult cr : classifierResults) {
+                    telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
+                }
+
+                // Access detector results
+                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+                for (LLResultTypes.DetectorResult dr : detectorResults) {
+                    telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
+                }
+
+                // Access fiducial results
+                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+                for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(),fr.getTargetXDegrees(), fr.getTargetYDegrees());
+                }
+
+                // Access color results
+                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                for (LLResultTypes.ColorResult cr : colorResults) {
+                    telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
+                }
+            }
+        } else {
+            telemetry.addData("Limelight", "No data available");
+        }
+    }
+    public void init_navx() throws InterruptedException {
+        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
+        gyro = (IntegratingGyroscope) navxMicro;
+        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        // Wait until the gyro calibration is complete
+        timer.reset();
+        while (navxMicro.isCalibrating()) {
+            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
+            telemetry.update();
+            //noinspection BusyWait
+            Thread.sleep(50);
+        }
+        telemetry.log().clear();
+        telemetry.log().add("Gyro Calibrated.");
+        telemetry.clear();
+        telemetry.update();
+    }
+    public void run_navx() {
+        // Read dimensionalized data from the gyro. This gyro can report angular velocities
+        // about all three axes. Additionally, it internally integrates the Z axis to
+        // be able to report an absolute angular Z orientation.
+        AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
+        Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        telemetry.addLine()
+                .addData("dx", formatRate(rates.xRotationRate))
+                .addData("dy", formatRate(rates.yRotationRate))
+                .addData("dz", "%s deg/s", formatRate(rates.zRotationRate));
+
+        telemetry.addLine()
+                .addData("heading", formatAngle(angles.angleUnit, angles.firstAngle))
+                .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
+                .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
+        telemetry.update();
+    }
 
     public void Mecanumdrive() {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -185,27 +289,8 @@ public class ArnavOpMode extends LinearOpMode {
         telemetry.addData("Status", "Actuators Initialized");
         telemetry.update();
 
-        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
-        gyro = (IntegratingGyroscope) navxMicro;
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
-        // Wait until the gyro calibration is complete
-        timer.reset();
-        while (navxMicro.isCalibrating()) {
-            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
-            telemetry.update();
-            //noinspection BusyWait
-            Thread.sleep(50);
-        }
-        telemetry.log().clear();
-        telemetry.log().add("Gyro Calibrated.");
-        telemetry.clear();
-        telemetry.update();
-
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        telemetry.setMsTransmissionInterval(11);
-        limelight.pipelineSwitch(0);
-        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
-        limelight.start();
+        init_navx();
+        init_LL();
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
 
@@ -214,83 +299,9 @@ public class ArnavOpMode extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // Read dimensionalized data from the gyro. This gyro can report angular velocities
-            // about all three axes. Additionally, it internally integrates the Z axis to
-            // be able to report an absolute angular Z orientation.
-            AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
-            Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            run_navx();
+            run_LL();
 
-            telemetry.addLine()
-                    .addData("dx", formatRate(rates.xRotationRate))
-                    .addData("dy", formatRate(rates.yRotationRate))
-                    .addData("dz", "%s deg/s", formatRate(rates.zRotationRate));
-
-            telemetry.addLine()
-                    .addData("heading", formatAngle(angles.angleUnit, angles.firstAngle))
-                    .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
-                    .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
-            telemetry.update();
-
-            LLStatus status = limelight.getStatus();
-            telemetry.addData("Name", "%s",
-                    status.getName());
-            telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-                    status.getTemp(), status.getCpu(),(int)status.getFps());
-            telemetry.addData("Pipeline", "Index: %d, Type: %s",
-                    status.getPipelineIndex(), status.getPipelineType());
-
-            LLResult result = limelight.getLatestResult();
-            if (result != null) {
-                // Access general information
-                Pose3D botpose = result.getBotpose();
-                double captureLatency = result.getCaptureLatency();
-                double targetingLatency = result.getTargetingLatency();
-                double parseLatency = result.getParseLatency();
-                telemetry.addData("LL Latency", captureLatency + targetingLatency);
-                telemetry.addData("Parse Latency", parseLatency);
-                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
-
-                if (result.isValid()) {
-                    telemetry.addData("tx", result.getTx());
-                    telemetry.addData("txnc", result.getTxNC());
-                    telemetry.addData("ty", result.getTy());
-                    telemetry.addData("tync", result.getTyNC());
-
-                    telemetry.addData("Botpose", botpose.toString());
-
-                    // Access barcode results
-                    List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                    for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                        telemetry.addData("Barcode", "Data: %s", br.getData());
-                    }
-
-                    // Access classifier results
-                    List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
-                    for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                        telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
-                    }
-
-                    // Access detector results
-                    List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                    for (LLResultTypes.DetectorResult dr : detectorResults) {
-                        telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
-                    }
-
-                    // Access fiducial results
-                    List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                    for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                        telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(),fr.getTargetXDegrees(), fr.getTargetYDegrees());
-                    }
-
-                    // Access color results
-                    List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                    for (LLResultTypes.ColorResult cr : colorResults) {
-                        telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
-                    }
-                }
-            } else {
-                telemetry.addData("Limelight", "No data available");
-            }
             Mecanumdrive();
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
