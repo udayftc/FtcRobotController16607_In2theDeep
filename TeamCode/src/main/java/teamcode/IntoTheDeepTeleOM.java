@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import java.util.List;
 
 @TeleOp
-public class IntoTheDeepTeleOp extends LinearOpMode {
+public class IntoTheDeepTeleOM extends LinearOpMode {
 
     //private DistanceSensor sensorColorRange;
 
