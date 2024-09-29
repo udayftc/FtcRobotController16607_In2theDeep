@@ -45,7 +45,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
 
     public void init_motors() {
-        Intake = hardwareMap.get(Servo.class, "Test");
+        Intake = hardwareMap.get(Servo.class, "Intake");
         Servoarm = hardwareMap.get(Servo.class, "Servoarm");
         Drone = hardwareMap.get(Servo.class, "Drone");
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
@@ -288,7 +288,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         telemetry.addData("Status", "Actuators Initialized");
         telemetry.update();
 
-        init_navx();
+       // init_navx();
         init_LL();
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
@@ -298,7 +298,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            run_navx();
+           // run_navx();
             run_LL();
 
             Mecanumdrive();
