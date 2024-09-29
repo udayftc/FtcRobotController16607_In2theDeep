@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.hardware.kauailabs.NavxMicroNavigationSensor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
 import com.qualcomm.robotcore.hardware.IntegratingGyroscope;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -24,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import java.util.List;
 
 @TeleOp
-public class ArnavOpMode extends LinearOpMode {
+public class IntoTheDeepTeleOp extends LinearOpMode {
 
     //private DistanceSensor sensorColorRange;
 
@@ -35,7 +34,7 @@ public class ArnavOpMode extends LinearOpMode {
     private DcMotor Backleft;
     private DcMotor Backright;
 
-    private Servo Test;
+    private Servo Intake;
     private Servo Drone;
     private Servo Servoarm;
 
@@ -46,7 +45,7 @@ public class ArnavOpMode extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
 
     public void init_motors() {
-        Test = hardwareMap.get(Servo.class, "Test");
+        Intake = hardwareMap.get(Servo.class, "Test");
         Servoarm = hardwareMap.get(Servo.class, "Servoarm");
         Drone = hardwareMap.get(Servo.class, "Drone");
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
@@ -305,9 +304,9 @@ public class ArnavOpMode extends LinearOpMode {
             Mecanumdrive();
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
-                Test.setPosition(0);
+                Intake.setPosition(0);
             } else if (gamepad1.dpad_right) {
-                Test.setPosition(1);
+                Intake.setPosition(1);
             } else if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
             } else if (gamepad1.right_bumper) {
