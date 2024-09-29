@@ -1,7 +1,4 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- *
- */
+
 
 package teamcode;
 
@@ -25,6 +22,7 @@ public class RobotParams
 {
     public static enum RobotType
     {
+        IntotheDeepRobot,
         CenterStageRobot,
         PowerPlayRobot,
         SwerveRobot,
@@ -37,7 +35,7 @@ public class RobotParams
     public static class Preferences
     {
         // Global config
-        public static RobotType robotType = RobotType.CenterStageRobot;
+        public static RobotType robotType = RobotType.IntotheDeepRobot;
         public static boolean inCompetition = false;
         // Miscellaneous
         public static boolean useTraceLog = true;
@@ -46,7 +44,7 @@ public class RobotParams
         public static boolean useBatteryMonitor = false;
         public static boolean doStatusUpdate = !inCompetition;
         // Vision
-        public static boolean useWebCam = robotType == RobotType.CenterStageRobot || robotType == RobotType.PowerPlayRobot;
+        public static boolean useWebCam = robotType == RobotType.CenterStageRobot || robotType == RobotType.IntotheDeepRobot;
         public static boolean hasWebCam2 = robotType == RobotType.CenterStageRobot;
         public static boolean useBuiltinCamBack = false;
         public static boolean tuneColorBlobVision = false;
@@ -56,23 +54,23 @@ public class RobotParams
         public static boolean useTfodModelAsset = false;
         public static boolean showVisionView = !inCompetition;
         // Drive Base
-        public static boolean useExternalOdometry = robotType == RobotType.CenterStageRobot || robotType == RobotType.PowerPlayRobot;
+        public static boolean useExternalOdometry = robotType == RobotType.CenterStageRobot || robotType == RobotType.IntotheDeepRobot;
         public static boolean doSwervePhysicalAlignment = false;
         public static boolean swerveDualServoSteering = true;
         // Subsystems
-        public static boolean useSubsystems = robotType == RobotType.CenterStageRobot;
+        public static boolean useSubsystems = robotType == RobotType.CenterStageRobot || robotType == RobotType.IntotheDeepRobot;
         public static boolean useElevatorArm = true;
         public static boolean useElevator = true;
         public static boolean useArm = true;
         public static boolean useWrist = true;
         public static boolean hasWristSensor = true;
         public static boolean useIntake = true;
-//        public static boolean hasIntakeSensor = false;
-        public static boolean usePixelTray = true;
-        public static boolean useLauncher = true;
+
+        public static boolean useSampleTray = false;
+        public static boolean useLauncher = false;
     }   //class Preferences
 
-    public static final String ROBOT_NAME                       = "CenterStage_2024";
+    public static final String ROBOT_NAME                       = "IntotheDeep_2025";
     public static RevHubOrientationOnRobot.LogoFacingDirection hubLogoDirection =
         Preferences.robotType == RobotType.CenterStageRobot ? RevHubOrientationOnRobot.LogoFacingDirection.LEFT :
         Preferences.robotType == RobotType.PowerPlayRobot ? RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD :
@@ -110,7 +108,7 @@ public class RobotParams
     public static final String HWNAME_ARM                       = "arm";
     public static final String HWNAME_WRIST                     = "wrist";
     public static final String HWNAME_INTAKE                    = "intake";
-    public static final String HWNAME_PIXELTRAY                 = "pixelTray";
+    public static final String HWNAME_SAMPLETRAY                 = "sampleTray";
     public static final String HWNAME_LAUNCHER                  = "launcher";
     //
     // Field dimensions.
@@ -197,26 +195,6 @@ public class RobotParams
     public static final double BACKCAM_Z_OFFSET                 = 6.25;
     public static final TrcPose2D BACKCAM_POSE                  = new TrcPose2D(
         BACKCAM_X_OFFSET, BACKCAM_Y_OFFSET, 180.0);
-//    // Camera: Micorosoft Lifecam HD 3000 v1/v2
-//    public static final double WEBCAM_FX                        = 678.154;  // in pixels
-//    public static final double WEBCAM_FY                        = 678.170;  // in pixels
-//    public static final double WEBCAM_CX                        = 318.135;  // in pixels
-//    public static final double WEBCAM_CY                        = 228.374;  // in pixels
-//    // Camera: Logitech C270
-//    public static final double WEBCAM_FX                        = 822.317;  // in pixels
-//    public static final double WEBCAM_FY                        = 822.317;  // in pixels
-//    public static final double WEBCAM_CX                        = 319.495;  // in pixels
-//    public static final double WEBCAM_CY                        = 242.502;  // in pixels
-//    // Camera: Logitech C310
-//    public static final double WEBCAM_FX                        = 821.993;  // in pixels
-//    public static final double WEBCAM_FY                        = 821.993;  // in pixels
-//    public static final double WEBCAM_CX                        = 330.489;  // in pixels
-//    public static final double WEBCAM_CY                        = 248.997;  // in pixels
-//    // Camera: Logitech C920
-//    public static final double WEBCAM_FX                        = 622.001;  // in pixels
-//    public static final double WEBCAM_FY                        = 622.001;  // in pixels
-//    public static final double WEBCAM_CX                        = 319.803;  // in pixels
-//    public static final double WEBCAM_CY                        = 241.251;  // in pixels
 
     // Measurement unit: pixels
     // TODO: Tune these!

@@ -43,10 +43,10 @@ public class CmdAuto implements TrcRobot.RobotCommand
         START,
         PLACE_PURPLE_PIXEL,
         DRIVE_TO_STACK,
-        PICKUP_PIXEL,
+        PICKUP_SAMPLE,
         DO_DELAY,
         DRIVE_TO_LOOKOUT,
-        AUTO_SCORE_PIXELS,
+        AUTO_SCORE_SAMPLES,
         PARK_AT_BACKSTAGE,
         DONE
     }   //enum State
@@ -202,7 +202,7 @@ public class CmdAuto implements TrcRobot.RobotCommand
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
                     if (autoChoices.strategy == FtcAuto.AutoStrategy.AUTO_SCORE_2PLUS1)
                     {
-                        robot.pixelTray.setUpperGateOpened(true, null);
+                        robot.sampleTray.setUpperGateOpened(true, null);
                         intermediate1 = robot.adjustPoseByAlliance(-1.6, 2.5, 180.0, autoChoices.alliance);
                         intermediate2 = robot.adjustPoseByAlliance(-2.3, 2.5, 180.0, autoChoices.alliance);
                         intermediate3 = robot.adjustPoseByAlliance(-2.3, 0.3, 180.0, autoChoices.alliance);
@@ -210,7 +210,7 @@ public class CmdAuto implements TrcRobot.RobotCommand
                         robot.robotDrive.purePursuitDrive.start(
                             event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             intermediate1, intermediate2, intermediate3, targetPose);
-                        sm.waitForSingleEvent(event, State.PICKUP_PIXEL);
+                        sm.waitForSingleEvent(event, State.PICKUP_SAMPLE);
                     }
                     else
                     {
@@ -218,7 +218,7 @@ public class CmdAuto implements TrcRobot.RobotCommand
                     }
                     break;
 
-                case PICKUP_PIXEL:
+                case PICKUP_SAMPLE:
                     robot.intake.setOn(0.0, 2.5, event);
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
                     intermediate1 = robot.adjustPoseByAlliance(-2.75, 0.6, -90.0, autoChoices.alliance);
@@ -243,7 +243,7 @@ public class CmdAuto implements TrcRobot.RobotCommand
                     break;
 
                 case DRIVE_TO_LOOKOUT:
-                    robot.pixelTray.setUpperGateOpened(false, null);
+                    robot.sampleTray.setUpperGateOpened(false, null);
                     // Drive to the lookout point where we can see the AprilTag clearly.
                     if (autoChoices.startPos == FtcAuto.StartPos.BACKSTAGE)
                     {
@@ -281,15 +281,15 @@ public class CmdAuto implements TrcRobot.RobotCommand
                             event, robot.robotDrive.driveBase.getFieldPosition(), false,
                             intermediate1, intermediate2, intermediate3, intermediate4, intermediate5, targetPose);
                     }
-                    sm.waitForSingleEvent(event, State.AUTO_SCORE_PIXELS);
+                    sm.waitForSingleEvent(event, State.AUTO_SCORE_SAMPLES);
                     break;
 
-                case AUTO_SCORE_PIXELS:
+                case AUTO_SCORE_SAMPLES:
 
                     robot.robotDrive.purePursuitDrive.setMoveOutputLimit(1.0);
-                    if (robot.placePixelTask != null)
+                    if (robot.placeSampleTask != null)
                     {
-                        robot.placePixelTask.autoAssistPlace(
+                        robot.placeSampleTask.autoAssistPlace(
                             true, teamPropIndex, autoChoices.strategy == FtcAuto.AutoStrategy.AUTO_SCORE_2PLUS1,
                             RobotParams.ELEVATOR_LOAD_POS, true, event);
                         sm.waitForSingleEvent(event, State.PARK_AT_BACKSTAGE);

@@ -262,25 +262,25 @@ public class FtcTest extends FtcTeleOp
                     if (robot.vision.purplePixelVision != null)
                     {
                         robot.globalTracer.traceInfo(moduleName, "Enabling PurplePixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.PixelType.PurplePixel, true);
+                        robot.vision.setPixelVisionEnabled(Vision.SampleType.PurplePixel, true);
                     }
 
                     if (robot.vision.greenPixelVision != null)
                     {
                         robot.globalTracer.traceInfo(moduleName, "Enabling GreenPixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.PixelType.GreenPixel, true);
+                        robot.vision.setPixelVisionEnabled(Vision.SampleType.GreenPixel, true);
                     }
 
                     if (robot.vision.yellowPixelVision != null)
                     {
                         robot.globalTracer.traceInfo(moduleName, "Enabling YellowPixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.PixelType.YellowPixel, true);
+                        robot.vision.setPixelVisionEnabled(Vision.SampleType.YellowPixel, true);
                     }
 
                     if (robot.vision.whitePixelVision != null)
                     {
                         robot.globalTracer.traceInfo(moduleName, "Enabling WhitePixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.PixelType.WhitePixel, true);
+                        robot.vision.setPixelVisionEnabled(Vision.SampleType.WhitePixel, true);
                     }
 
                     if (robot.vision.redBlobVision != null)

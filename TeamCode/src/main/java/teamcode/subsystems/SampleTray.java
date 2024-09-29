@@ -27,7 +27,7 @@ import TrcCommonLib.trclib.TrcEvent;
 import ftclib.FtcServo;
 import teamcode.RobotParams;
 
-public class PixelTray
+public class SampleTray
 {
     private final TrcDbgTrace tracer;
     private final String instanceName;
@@ -39,7 +39,7 @@ public class PixelTray
      *
      * @param instanceName specifies the hardware name.
      */
-    public PixelTray(String instanceName)
+    public SampleTray(String instanceName)
     {
         tracer = new TrcDbgTrace(instanceName);
         this.instanceName = instanceName;

@@ -1,6 +1,4 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- */
+
 
 package teamcode;
 
@@ -18,14 +16,14 @@ import ftclib.FtcMatchInfo;
 import ftclib.FtcOpMode;
 import ftclib.FtcRobotBattery;
 import ftclib.FtcMatchInfo;
-import teamcode.autotasks.TaskAutoPlacePixel;
+import teamcode.autotasks.TaskAutoPlaceSample;
 import teamcode.drivebases.MecanumDrive;
 import teamcode.drivebases.RobotDrive;
 import teamcode.drivebases.SwerveDrive;
 import teamcode.subsystems.BlinkinLEDs;
 import teamcode.subsystems.ElevatorArm;
 import teamcode.subsystems.Intake;
-import teamcode.subsystems.PixelTray;
+import teamcode.subsystems.SampleTray;
 import teamcode.vision.Vision;
 
 /**
@@ -59,10 +57,10 @@ public class Robot
     public RobotDrive robotDrive;
     public ElevatorArm elevatorArm;
     public Intake intake;
-    public PixelTray pixelTray;
+    public SampleTray sampleTray;
     public FtcDcMotor launcher;
 
-    public TaskAutoPlacePixel placePixelTask;
+    public TaskAutoPlaceSample placeSampleTask;
 
     /**
      * Constructor: Create an instance of the object.
@@ -135,19 +133,19 @@ public class Robot
                     intake = new Intake(RobotParams.HWNAME_INTAKE);
                 }
 
-                if (RobotParams.Preferences.usePixelTray)
+                if (RobotParams.Preferences.useSampleTray)
                 {
-                    pixelTray = new PixelTray(RobotParams.HWNAME_PIXELTRAY);
+                    sampleTray = new SampleTray(RobotParams.HWNAME_SAMPLETRAY);
                     // Code review: Should this init be in Robot.startMode?
                     if (runMode == TrcRobot.RunMode.TELEOP_MODE)
                     {
-                        pixelTray.setUpperGateOpened(true, null);
-                        pixelTray.setLowerGateOpened(true, null);
+                        sampleTray.setUpperGateOpened(true, null);
+                        sampleTray.setLowerGateOpened(true, null);
                     }
                     else
                     {
-                        pixelTray.setUpperGateOpened(false, null);
-                        pixelTray.setLowerGateOpened(false, null);
+                        sampleTray.setUpperGateOpened(false, null);
+                        sampleTray.setLowerGateOpened(false, null);
                     }
                 }
 
@@ -160,7 +158,7 @@ public class Robot
                 //
                 // Create auto tasks here.
                 //
-                placePixelTask = new TaskAutoPlacePixel("PlacePixelTask", this);
+                placeSampleTask = new TaskAutoPlaceSample("PlaceSampleTask", this);
             }
         }
 
@@ -261,25 +259,25 @@ public class Robot
             if (vision.purplePixelVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling PurplePixelVision.");
-                vision.setPixelVisionEnabled(Vision.PixelType.PurplePixel, false);
+                vision.setPixelVisionEnabled(Vision.SampleType.PurplePixel, false);
             }
 
             if (vision.greenPixelVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling GreenPixelVision.");
-                vision.setPixelVisionEnabled(Vision.PixelType.GreenPixel, false);
+                vision.setPixelVisionEnabled(Vision.SampleType.GreenPixel, false);
             }
 
             if (vision.yellowPixelVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling YellowPixelVision.");
-                vision.setPixelVisionEnabled(Vision.PixelType.YellowPixel, false);
+                vision.setPixelVisionEnabled(Vision.SampleType.YellowPixel, false);
             }
 
             if (vision.whitePixelVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling WhitePixelVision.");
-                vision.setPixelVisionEnabled(Vision.PixelType.WhitePixel, false);
+                vision.setPixelVisionEnabled(Vision.SampleType.WhitePixel, false);
             }
 
             if (vision.redBlobVision != null)
@@ -377,11 +375,11 @@ public class Robot
                     lineNum++, "Intake: power=%.1f", intake.getIntakeMotor().getPower());
             }
 
-            if (pixelTray != null)
+            if (sampleTray != null)
             {
                 dashboard.displayPrintf(
-                    lineNum++, "PixelTray: lowerGateOpened=%s, upperGateOpened=%s",
-                    pixelTray.isLowerGateOpened(), pixelTray.isUpperGateOpened());
+                    lineNum++, "SAMPLETray: lowerGateOpened=%s, upperGateOpened=%s",
+                    sampleTray.isLowerGateOpened(), sampleTray.isUpperGateOpened());
             }
         }
     }   //updateStatus

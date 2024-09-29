@@ -1,6 +1,4 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- */
+
 
 package teamcode;
 
@@ -20,7 +18,7 @@ import ftclib.FtcOpMode;
 import teamcode.drivebases.SwerveDrive;
 
 /**
- * This class contains the TeleOp Mode program. FTC3543
+ * This class contains the TeleOp Mode program.
  */
 @TeleOp(name="FtcTeleOp", group="Ftc16607")
 public class FtcTeleOp extends FtcOpMode
@@ -304,9 +302,9 @@ public class FtcTeleOp extends FtcOpMode
                 if (pressed)
                 {
                     robot.globalTracer.traceInfo(moduleName, ">>>>> CancelAll is pressed.");
-                    if (robot.placePixelTask != null)
+                    if (robot.placeSampleTask != null)
                     {
-                        robot.placePixelTask.autoAssistCancel();
+                        robot.placeSampleTask.autoAssistCancel();
                     }
 
                     if (robot.elevatorArm != null)
@@ -454,22 +452,22 @@ public class FtcTeleOp extends FtcOpMode
         switch (button)
         {
             case FtcGamepad.GAMEPAD_A:
-                if (pressed && robot.pixelTray != null)
+                if (pressed && robot.sampleTray != null)
                 {
                     pixelTrayLowerGateOpened = !pixelTrayLowerGateOpened;
                     robot.globalTracer.traceInfo(
                         moduleName, ">>>>> Toggle lower gate: open=" + pixelTrayLowerGateOpened);
-                    robot.pixelTray.setLowerGateOpened(pixelTrayLowerGateOpened, null);
+                    robot.sampleTray.setLowerGateOpened(pixelTrayLowerGateOpened, null);
                 }
                 break;
 
             case FtcGamepad.GAMEPAD_B:
-                if (pressed && robot.pixelTray != null)
+                if (pressed && robot.sampleTray != null)
                 {
                     pixelTrayUpperGateOpened = !pixelTrayUpperGateOpened;
                     robot.globalTracer.traceInfo(
                         moduleName, ">>>>> Toggle upper gate: open=" + pixelTrayUpperGateOpened);
-                    robot.pixelTray.setUpperGateOpened(pixelTrayUpperGateOpened, null);
+                    robot.sampleTray.setUpperGateOpened(pixelTrayUpperGateOpened, null);
                 }
                 break;
 
@@ -632,7 +630,7 @@ public class FtcTeleOp extends FtcOpMode
             case FtcGamepad.GAMEPAD_BACK:
                 if (autoAssistPlaceActive)
                 {
-                    if (pressed && robot.placePixelTask != null)
+                    if (pressed && robot.placeSampleTask != null)
                     {
                         // If we are not running a match and just ran TeleOp, autoChoices.autoMenuRan will be false.
                         // In this case, we don't really know what alliance we are in. We will look for any AprilTag
@@ -641,7 +639,7 @@ public class FtcTeleOp extends FtcOpMode
                             moduleName,
                             ">>>>> AutoAssistPlace starting: aprilTagIndex=" + aprilTagIndex +
                             " scoreLevel=" + scoreLevelIndex);
-                        robot.placePixelTask.autoAssistPlace(
+                        robot.placeSampleTask.autoAssistPlace(
                             true, aprilTagIndex, false, RobotParams.ELEVATOR_PRESETS[scoreLevelIndex], false, null);
                     }
                 }

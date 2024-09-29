@@ -1,24 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 package teamcode.autotasks;
 
@@ -40,25 +19,25 @@ import teamcode.vision.Vision;
 /**
  * This class implements auto-assist pickup pixel task.
  */
-public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
+public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State>
 {
-    private static final String moduleName = TaskAutoPickupPixel.class.getSimpleName();
+    private static final String moduleName = TaskAutoPickupSample.class.getSimpleName();
 
     public enum State
     {
         START,
-        FIND_PIXEL,
-        ALIGN_TO_PIXEL,
-        PICK_UP_PIXEL,
+        FIND_SAMPLE,
+        ALIGN_TO_SAMPLE,
+        PICK_UP_SAMPLE,
         DONE
     }   //enum State
 
     private static class TaskParams
     {
-        Vision.PixelType pixelType;
-        TaskParams(Vision.PixelType pixelType)
+        Vision.SampleType sampleType;
+        TaskParams(Vision.SampleType pixelType)
         {
-            this.pixelType = pixelType;
+            this.sampleType = sampleType;
         }   //TaskParams
     }   //class TaskParams
 
@@ -67,8 +46,8 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
     private final TrcEvent event;
 
     private String currOwner = null;
-    private Vision.PixelType pixelType = null;
-    private TrcPose2D pixelPose = null;
+    private Vision.SampleType pixelType = null;
+    private TrcPose2D samplePose = null;
     private Double visionExpiredTime = null;
 
     /**
@@ -77,7 +56,7 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
      * @param ownerName specifies the owner name to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      */
-    public TaskAutoPickupPixel(String ownerName, Robot robot)
+    public TaskAutoPickupSample(String ownerName, Robot robot)
     {
         super(moduleName, ownerName, TrcTaskMgr.TaskType.POST_PERIODIC_TASK);
         this.ownerName = ownerName;
@@ -91,7 +70,7 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
      * @param pixelType specifies the pixel type to look for and pick up.
      * @param completionEvent specifies the event to signal when done, can be null if none provided.
      */
-    public void autoAssistPickup(Vision.PixelType pixelType, TrcEvent completionEvent)
+    public void autoAssistPickup(Vision.SampleType pixelType, TrcEvent completionEvent)
     {
         tracer.traceInfo(moduleName, "pixelType=%s, event=%s", pixelType, completionEvent);
         this.pixelType = pixelType;
@@ -196,21 +175,21 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
         {
             case START:
                 // Set up robot.
-                pixelPose = null;
+                samplePose = null;
                 if (robot.vision != null)
                 {
                     // Set up vision: turn on front camera and enable pixel detection pipeline.
                     robot.vision.setActiveWebcam(robot.vision.getFrontWebcam());
-                    robot.vision.setPixelVisionEnabled(taskParams.pixelType, true);
+                    robot.vision.setPixelVisionEnabled(taskParams.sampleType, true);
                     if (robot.elevatorArm != null)
                     {
                         // Make sure the ElevatorArm is at loading position.
                         robot.elevatorArm.setLoadingPosition(currOwner, 0.0, event, 0.0);
-                        sm.waitForSingleEvent(event, State.FIND_PIXEL);
+                        sm.waitForSingleEvent(event, State.FIND_SAMPLE);
                     }
                     else
                     {
-                        sm.setState(State.FIND_PIXEL);
+                        sm.setState(State.FIND_SAMPLE);
                     }
                 }
                 else
@@ -220,22 +199,22 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
                 }
                 break;
 
-            case FIND_PIXEL:
+            case FIND_SAMPLE:
                 // Use vision to locate pixel.
-                if (robot.vision.isPixelVisionEnabled(taskParams.pixelType))
+                if (robot.vision.isPixelVisionEnabled(taskParams.sampleType))
                 {
                     TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> pixelInfo =
-                        robot.vision.getDetectedPixel(taskParams.pixelType, -1);
+                        robot.vision.getDetectedPixel(taskParams.sampleType, -1);
                     if (pixelInfo != null)
                     {
-                        pixelPose = new TrcPose2D(
+                        samplePose = new TrcPose2D(
                             pixelInfo.objPose.x, pixelInfo.objPose.y - 6.0, pixelInfo.objPose.yaw);
                         String msg = String.format(
                             Locale.US, "%s is found at x %.1f, y %.1f, angle=%.1f",
-                            taskParams.pixelType, pixelInfo.objPose.x, pixelInfo.objPose.y, pixelInfo.objPose.yaw);
+                            taskParams.sampleType, pixelInfo.objPose.x, pixelInfo.objPose.y, pixelInfo.objPose.yaw);
                         tracer.traceInfo(moduleName, msg);
                         robot.speak(msg);
-                        sm.setState(State.ALIGN_TO_PIXEL);
+                        sm.setState(State.ALIGN_TO_SAMPLE);
                     }
                     else if (visionExpiredTime == null)
                     {
@@ -245,7 +224,7 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
                     else if (TrcTimer.getCurrentTime() >= visionExpiredTime)
                     {
                         // Timing out, moving on.
-                        tracer.traceInfo(moduleName, "%s not found.", taskParams.pixelType);
+                        tracer.traceInfo(moduleName, "%s not found.", taskParams.sampleType);
                         if (robot.blinkin != null)
                         {
                             // Tell the drivers vision doesn't see anything so they can score manually.
@@ -263,13 +242,13 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
                 }
                 break;
 
-            case ALIGN_TO_PIXEL:
+            case ALIGN_TO_SAMPLE:
                 // Navigate robot to the pixel.
-                if (pixelPose != null)
+                if (samplePose != null)
                 {
                     robot.robotDrive.purePursuitDrive.start(
-                        event, robot.robotDrive.driveBase.getFieldPosition(), true, pixelPose);
-                    sm.waitForSingleEvent(event, State.PICK_UP_PIXEL);
+                        event, robot.robotDrive.driveBase.getFieldPosition(), true, samplePose);
+                    sm.waitForSingleEvent(event, State.PICK_UP_SAMPLE);
                 }
                 else
                 {
@@ -277,7 +256,7 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
                 }
                 break;
 
-            case PICK_UP_PIXEL:
+            case PICK_UP_SAMPLE:
                 // Pick up pixel.
                 robot.intake.setOn(0.0, 6.0 , event);
                 sm.waitForSingleEvent(event, State.DONE);
@@ -286,7 +265,7 @@ public class TaskAutoPickupPixel extends TrcAutoTask<TaskAutoPickupPixel.State>
             default:
             case DONE:
                 // Stop task.
-                robot.pixelTray.setUpperGateOpened(false, null);
+                robot.sampleTray.setUpperGateOpened(false, null);
                 stopAutoTask(true);
                 break;
         }

@@ -1,24 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 package teamcode.autotasks;
 
@@ -40,9 +19,9 @@ import teamcode.subsystems.BlinkinLEDs;
 /**
  * This class implements auto-assist place pixel task.
  */
-public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
+public class TaskAutoPlaceSample extends TrcAutoTask<TaskAutoPlaceSample.State>
 {
-    private static final String moduleName = TaskAutoPlacePixel.class.getSimpleName();
+    private static final String moduleName = TaskAutoPlaceSample.class.getSimpleName();
 
     public enum State
     {
@@ -51,9 +30,9 @@ public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
         SET_SCORING_POS,
         DRIVE_TO_APRILTAG,
         LOWER_ELEVATOR,
-        PLACE_PIXEL_1,
+        PLACE_SAMPLE_1,
         DRIVE_TO_POS_2,
-        PLACE_PIXEL_2,
+        PLACE_SAMPLE_2,
         RAISE_ELEVATOR,
         RETRACT_ALL,
         DONE
@@ -94,7 +73,7 @@ public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
      * @param ownerName specifies the owner name to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      */
-    public TaskAutoPlacePixel(String ownerName, Robot robot)
+    public TaskAutoPlaceSample(String ownerName, Robot robot)
     {
         super(moduleName, ownerName, TrcTaskMgr.TaskType.POST_PERIODIC_TASK);
         this.ownerName = ownerName;
@@ -230,10 +209,10 @@ public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
         {
             case START:
                 aprilTagPose = null;
-                if (robot.pixelTray != null)
+                if (robot.sampleTray != null)
                 {
-                    robot.pixelTray.setUpperGateOpened(false, null);
-                    robot.pixelTray.setLowerGateOpened(false, null);
+                    robot.sampleTray.setUpperGateOpened(false, null);
+                    robot.sampleTray.setLowerGateOpened(false, null);
                 }
 
                 if (taskParams.useVision && robot.vision != null && robot.vision.aprilTagVision != null)
@@ -406,23 +385,23 @@ public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
                     robot.elevatorArm.elevatorSetPosition(
                         currOwner, 0.0, taskParams.scoreLevel, RobotParams.ELEVATOR_POWER_LIMIT,
                         elevatorArmEvent, 0.0);
-                    sm.waitForSingleEvent(elevatorArmEvent, State.PLACE_PIXEL_1);
+                    sm.waitForSingleEvent(elevatorArmEvent, State.PLACE_SAMPLE_1);
                 }
                 else
                 {
-                    sm.setState(State.PLACE_PIXEL_1);
+                    sm.setState(State.PLACE_SAMPLE_1);
                 }
                 break;
 
-            case PLACE_PIXEL_1:
+            case PLACE_SAMPLE_1:
                 // Place pixel at the appropriate location on the backdrop.
-                if (robot.pixelTray != null)
+                if (robot.sampleTray != null)
                 {
-                    robot.pixelTray.setUpperGateOpened(true, event);
+                    robot.sampleTray.setUpperGateOpened(true, event);
                     if (!taskParams.hasSecondPixel)
                     {
                         // We are scoring lower pixel, open the lower gate too.
-                        robot.pixelTray.setLowerGateOpened(true, null);
+                        robot.sampleTray.setLowerGateOpened(true, null);
                     }
                     sm.waitForSingleEvent(
                         event, taskParams.hasSecondPixel ? State.DRIVE_TO_POS_2 : State.RAISE_ELEVATOR);
@@ -438,14 +417,14 @@ public class TaskAutoPlacePixel extends TrcAutoTask<TaskAutoPlacePixel.State>
                 // We just scored the first pixel, we are moving to the position to score the second pixel.
                 robot.robotDrive.purePursuitDrive.start(
                     currOwner, event, 10.0, robot.robotDrive.driveBase.getFieldPosition(), false, adjAprilTagPose);
-                sm.waitForSingleEvent(event, State.PLACE_PIXEL_2);
+                sm.waitForSingleEvent(event, State.PLACE_SAMPLE_2);
                 break;
 
-            case PLACE_PIXEL_2:
+            case PLACE_SAMPLE_2:
                 // Place pixel at the appropriate location on the backdrop.
-                if (robot.pixelTray != null)
+                if (robot.sampleTray != null)
                 {
-                    robot.pixelTray.setLowerGateOpened(true, event);
+                    robot.sampleTray.setLowerGateOpened(true, event);
                     sm.waitForSingleEvent(event, State.RAISE_ELEVATOR);
                 }
                 else

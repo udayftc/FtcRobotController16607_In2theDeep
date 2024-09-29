@@ -63,8 +63,13 @@ public class Vision
 {
     private static final String moduleName = Vision.class.getSimpleName();
 
-    public enum PixelType
+    public enum SampleType
     {
+        BlueSample,
+        BlueSpecimen,
+        RedSample,
+        RedSpecimen,
+        YellowSample,
         PurplePixel,
         GreenPixel,
         YellowPixel,
@@ -511,7 +516,7 @@ public class Vision
      * @param pixelType specifies the pixel type to be detected.
      * @param enabled specifies true to enable, false to disable.
      */
-    public void setPixelVisionEnabled(PixelType pixelType, boolean enabled)
+    public void setPixelVisionEnabled(SampleType pixelType, boolean enabled)
     {
         switch (pixelType)
         {
@@ -570,7 +575,7 @@ public class Vision
      * @param pixelType specifies the pixel type to be detected.
      * @return true if enabled, false if disabled.
      */
-    public boolean isPixelVisionEnabled(PixelType pixelType)
+    public boolean isPixelVisionEnabled(SampleType pixelType)
     {
         boolean enabled = false;
 
@@ -611,7 +616,7 @@ public class Vision
      * @return detected Purple Pixel object info.
      */
     public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPixel(
-        PixelType pixelType, int lineNum)
+        SampleType pixelType, int lineNum)
     {
         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> pixelInfo = null;
         String pixelName = null;
