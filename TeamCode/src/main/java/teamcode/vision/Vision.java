@@ -88,14 +88,7 @@ public class Vision
     private static final double[] whitePixelColorThresholds = {250.0, 255.0, 100.0, 130.0, 120.0, 140.0};
     private static final double[] redBlobColorThresholds = {20.0, 120.0, 180.0, 240.0, 90.0, 120.0};
     private static final double[] blueBlobColorThresholds = {20.0, 250.0, 40.0, 250.0, 160.0, 240.0};
-//    // HSV Color Space.
-//    private static final int colorConversion = Imgproc.COLOR_RGB2HSV_FULL;
-//    private static final double[] purplePixelColorThresholds = {170.0, 200.0, 40.0, 160.0, 100.0, 255.0};
-//    private static final double[] greenPixelColorThresholds = {60.0, 120.0, 60.0, 255.0, 60.0, 255.0};
-//    private static final double[] yellowPixelColorThresholds = {30.0, 60.0, 120.0, 225.0, 200.0, 255.0};
-//    private static final double[] whitePixelColorThresholds = {70.0, 120.0, 0.0, 255.0, 230.0, 255.0};
-//    private static final double[] redBlobColorThresholds = {0.0, 10.0, 120.0, 255.0, 100.0, 255.0};
-//    private static final double[] blueBlobColorThresholds = {160.0, 200.0, 120.0, 255.0, 100.0, 255.0};
+
     private static final TrcOpenCvColorBlobPipeline.FilterContourParams pixelFilterContourParams =
         new TrcOpenCvColorBlobPipeline.FilterContourParams()
             .setMinArea(1000.0)
@@ -210,57 +203,9 @@ public class Vision
             if (RobotParams.Preferences.useColorBlobVision)
             {
                 tracer.traceInfo(moduleName, "Starting ColorBlobVision...");
-               /* purplePixelVision = new FtcVisionEocvColorBlob(
-                    "PurplePixel", colorConversion, purplePixelColorThresholds, pixelFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                purplePixelProcessor = purplePixelVision.getVisionProcessor();
-                visionProcessorsList.add(purplePixelProcessor);
-
-                greenPixelVision = new FtcVisionEocvColorBlob(
-                    "GreenPixel", colorConversion, greenPixelColorThresholds, pixelFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                greenPixelProcessor = greenPixelVision.getVisionProcessor();
-                visionProcessorsList.add(greenPixelProcessor);
-
-                yellowPixelVision = new FtcVisionEocvColorBlob(
-                    "YellowPixel", colorConversion, yellowPixelColorThresholds, pixelFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                yellowPixelProcessor = yellowPixelVision.getVisionProcessor();
-                visionProcessorsList.add(yellowPixelProcessor);
-
-                whitePixelVision = new FtcVisionEocvColorBlob(
-                    "WhitePixel", colorConversion, whitePixelColorThresholds, pixelFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                whitePixelProcessor = whitePixelVision.getVisionProcessor();
-                visionProcessorsList.add(whitePixelProcessor);
-
-                redBlobVision = new FtcVisionEocvColorBlob(
-                    "RedBlob", colorConversion, redBlobColorThresholds, blobFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                redBlobProcessor = redBlobVision.getVisionProcessor();
-                visionProcessorsList.add(redBlobProcessor);
-
-                blueBlobVision = new FtcVisionEocvColorBlob(
-                    "BlueBlob", colorConversion, blueBlobColorThresholds, blobFilterContourParams, true,
-                    RobotParams.cameraRect, RobotParams.worldRect, true);
-                blueBlobProcessor = blueBlobVision.getVisionProcessor();
-                visionProcessorsList.add(blueBlobProcessor);*/
             }
 
-           /* if (RobotParams.Preferences.useTensorFlowVision)
-            {
-                tracer.traceInfo(moduleName, "Starting TensorFlowVision...");
-                String model = RobotParams.Preferences.useTfodModelAsset? TFOD_MODEL_ASSET: TFOD_MODEL_FILENAME;
-                String[] labels = RobotParams.Preferences.useTfodModelAsset? TFOD_FIRST_LABELS: TFOD_TRC_LABELS;
-                tensorFlowVision = new FtcVisionTensorFlow(
-                    null, RobotParams.Preferences.useTfodModelAsset, model, labels, RobotParams.cameraRect,
-                    RobotParams.worldRect);
-                tensorFlowProcessor = tensorFlowVision.getVisionProcessor();
-                tensorFlowProcessor.setMinResultConfidence(TFOD_MIN_CONFIDENCE);
-                visionProcessorsList.add(tensorFlowProcessor);
-            }*/
-
-            VisionProcessor[] visionProcessors = new VisionProcessor[visionProcessorsList.size()];
+                       VisionProcessor[] visionProcessors = new VisionProcessor[visionProcessorsList.size()];
             visionProcessorsList.toArray(visionProcessors);
             if (RobotParams.Preferences.useWebCam)
             {
