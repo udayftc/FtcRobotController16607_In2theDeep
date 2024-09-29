@@ -288,7 +288,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         telemetry.addData("Status", "Actuators Initialized");
         telemetry.update();
 
-       // init_navx();
+        init_navx();
         init_LL();
         telemetry.addData(">", "Robot Ready.  Press Play.");
         telemetry.update();
@@ -298,7 +298,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-           // run_navx();
+            run_navx();
             run_LL();
 
             Mecanumdrive();
