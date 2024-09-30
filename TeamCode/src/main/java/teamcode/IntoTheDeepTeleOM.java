@@ -42,6 +42,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
 
+    int flencoderpos = 0;
+    int frencoderpos = 0;
+    int blencoderpos = 0;
+    int brencoderpos = 0;
+
     ElapsedTime timer = new ElapsedTime();
 
     public void init_motors() {
@@ -190,6 +195,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     public void Mecanumdrive() {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
+        frencoderpos = Frontright.getCurrentPosition();
+        brencoderpos = Backright.getCurrentPosition();
+        flencoderpos = Frontleft.getCurrentPosition();
+        blencoderpos = Backleft.getCurrentPosition();
+
         double h = Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
         double robotAngle = Math.atan2(gamepad1.right_stick_y, gamepad1.right_stick_x) - Math.PI / 4;
         double rightX = gamepad1.left_stick_x;

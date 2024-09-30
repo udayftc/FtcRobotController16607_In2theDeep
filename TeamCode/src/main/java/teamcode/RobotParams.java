@@ -88,10 +88,10 @@ public class RobotParams
     public static final String HWNAME_WEBCAM2                   = "Webcam 2";
     public static final String HWNAME_BLINKIN                   = "blinkin";
     // Drive Base.
-    public static final String HWNAME_LFDRIVE_MOTOR             = "lfDriveMotor";
-    public static final String HWNAME_RFDRIVE_MOTOR             = "rfDriveMotor";
-    public static final String HWNAME_LBDRIVE_MOTOR             = "lbDriveMotor";
-    public static final String HWNAME_RBDRIVE_MOTOR             = "rbDriveMotor";
+    public static final String HWNAME_LFDRIVE_MOTOR             = "Frontleft";
+    public static final String HWNAME_RFDRIVE_MOTOR             = "Frontright";
+    public static final String HWNAME_LBDRIVE_MOTOR             = "Backleft";
+    public static final String HWNAME_RBDRIVE_MOTOR             = "Backright";
     public static final String HWNAME_LFSTEER_SERVO             = "lfSteerServo";
     public static final String HWNAME_RFSTEER_SERVO             = "rfSteerServo";
     public static final String HWNAME_LBSTEER_SERVO             = "lbSteerServo";
@@ -101,10 +101,10 @@ public class RobotParams
     public static final String HWNAME_LBSTEER_ENCODER           = "lbSteerEncoder";
     public static final String HWNAME_RBSTEER_ENCODER           = "rbSteerEncoder";
     // Subsystems.
-    public static final String HWNAME_ELEVATOR                  = "elevator";
-    public static final String HWNAME_ARM                       = "arm";
+    public static final String HWNAME_ELEVATOR                  = "LadderLift";
+    public static final String HWNAME_ARM                       = "Servoarm";
     public static final String HWNAME_WRIST                     = "wrist";
-    public static final String HWNAME_INTAKE                    = "intake";
+    public static final String HWNAME_INTAKE                    = "Intake";
     public static final String HWNAME_SAMPLETRAY                 = "sampleTray";
     //
     // Field dimensions.
