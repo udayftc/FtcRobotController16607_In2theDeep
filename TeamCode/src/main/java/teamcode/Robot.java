@@ -58,7 +58,6 @@ public class Robot
     public ElevatorArm elevatorArm;
     public Intake intake;
     public SampleTray sampleTray;
-    public FtcDcMotor launcher;
 
     public TaskAutoPlaceSample placeSampleTask;
 
@@ -149,12 +148,6 @@ public class Robot
                     }
                 }
 
-                if (RobotParams.Preferences.useLauncher)
-                {
-                    launcher = new FtcDcMotor(RobotParams.HWNAME_LAUNCHER);
-                    launcher.setVoltageCompensationEnabled(TrcUtil.BATTERY_NOMINAL_VOLTAGE);
-                    launcher.setMotorInverted(RobotParams.LAUNCHER_MOTOR_INVERTED);
-                }
                 //
                 // Create auto tasks here.
                 //
@@ -256,28 +249,10 @@ public class Robot
                 vision.setAprilTagVisionEnabled(false);
             }
 
-            if (vision.purplePixelVision != null)
-            {
-                globalTracer.traceInfo(moduleName, "Disabling PurplePixelVision.");
-                vision.setPixelVisionEnabled(Vision.SampleType.PurplePixel, false);
-            }
-
-            if (vision.greenPixelVision != null)
-            {
-                globalTracer.traceInfo(moduleName, "Disabling GreenPixelVision.");
-                vision.setPixelVisionEnabled(Vision.SampleType.GreenPixel, false);
-            }
-
-            if (vision.yellowPixelVision != null)
+            if (vision.yellowSampleVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling YellowPixelVision.");
-                vision.setPixelVisionEnabled(Vision.SampleType.YellowPixel, false);
-            }
-
-            if (vision.whitePixelVision != null)
-            {
-                globalTracer.traceInfo(moduleName, "Disabling WhitePixelVision.");
-                vision.setPixelVisionEnabled(Vision.SampleType.WhitePixel, false);
+                vision.setSampleVisionEnabled(Vision.SampleType.YellowSample, false);
             }
 
             if (vision.redBlobVision != null)

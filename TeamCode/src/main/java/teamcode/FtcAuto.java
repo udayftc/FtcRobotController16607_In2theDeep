@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- */
 
 package teamcode;
 
@@ -242,12 +239,6 @@ public class FtcAuto extends FtcOpMode
 
         if (robot.vision != null)
         {
-            // We are done with detecting TeamProp with TensorFlow, shut it down.
-           /* if (robot.vision.tensorFlowVision != null)
-            {
-                robot.globalTracer.traceInfo(moduleName, "Disabling TensorFlowVision.");
-                robot.vision.setTensorFlowVisionEnabled(false);
-            }*/
             // We are done with detecting TeamProp with ColorBlob detection, shut it down.
             robot.vision.setRedBlobVisionEnabled(false);
             robot.vision.setBlueBlobVisionEnabled(false);

@@ -1,24 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 package teamcode.subsystems;
 
@@ -41,10 +20,7 @@ public class BlinkinLEDs extends FtcRevBlinkin
     public static final String SCORE_LEVEL_2 = "ScoreLevel2";
     public static final String DETECTED_NOTHING = "NoDetection";
     public static final String APRIL_TAG = "AprilTag";
-    public static final String PURPLE_PIXEL = "PurplePixel";
-    public static final String GREEN_PIXEL = "GreenPixel";
-    public static final String YELLOW_PIXEL = "YellowPixel";
-    public static final String WHITE_PIXEL = "WhitePixel";
+    public static final String YELLOW_SAMPLE = "YellowSample";
     public static final String RED_BLOB_POS_1 = "RedBlob1";
     public static final String RED_BLOB_POS_2 = "RedBlob2";
     public static final String RED_BLOB_POS_3 = "RedBlob3";
@@ -59,7 +35,6 @@ public class BlinkinLEDs extends FtcRevBlinkin
 
     /**
      * Constructor: Create an instance of the object.
-     *
      * @param instanceName specifies the instance name. This is also the REV Blinkin's hardware name.
      */
     public BlinkinLEDs(String instanceName)
@@ -82,10 +57,7 @@ public class BlinkinLEDs extends FtcRevBlinkin
             new TrcRevBlinkin.Pattern(BLUE_BLOB_POS_3, RevLedPattern.SolidYellow),
             new TrcRevBlinkin.Pattern(DETECTED_NOTHING, RevLedPattern.SolidViolet),
             new TrcRevBlinkin.Pattern(APRIL_TAG, RevLedPattern.SolidAqua),
-            new TrcRevBlinkin.Pattern(PURPLE_PIXEL, RevLedPattern.SolidViolet),
-            new TrcRevBlinkin.Pattern(GREEN_PIXEL, RevLedPattern.SolidGreen),
-            new TrcRevBlinkin.Pattern(YELLOW_PIXEL, RevLedPattern.SolidYellow),
-            new TrcRevBlinkin.Pattern(WHITE_PIXEL, RevLedPattern.SolidWhite),
+            new TrcRevBlinkin.Pattern(YELLOW_SAMPLE, RevLedPattern.SolidYellow),
             new TrcRevBlinkin.Pattern(TENSOR_FLOW, RevLedPattern.SolidGray),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_FIELD, RevLedPattern.SolidLime),
             new TrcRevBlinkin.Pattern(DRIVE_ORIENTATION_ROBOT, RevLedPattern.SolidBlue),
@@ -131,7 +103,6 @@ public class BlinkinLEDs extends FtcRevBlinkin
 
     /**
      * This method sets the LED to indicate the selected score level on the backdrop.
-     *
      * @param index specifies the score level index.
      */
     public void setScoreLevelIndex(int index)
@@ -154,7 +125,6 @@ public class BlinkinLEDs extends FtcRevBlinkin
 
     /**
      * This method sets the LED to indicate the drive orientation mode of the robot.
-     *
      * @param orientation specifies the drive orientation mode.
      */
     public void setDriveOrientation(TrcDriveBase.DriveOrientation orientation)

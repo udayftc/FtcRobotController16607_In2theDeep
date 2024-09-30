@@ -70,11 +70,7 @@ public class Vision
         RedSample,
         RedSpecimen,
         YellowSample,
-        PurplePixel,
-        GreenPixel,
-        YellowPixel,
-        WhitePixel,
-        AnyPixel
+        AnySample
     }   //enum PixelType
 
     // Warning: EOCV converts camera stream to RGBA whereas Desktop OpenCV converts it to BGRA. Therefore, the correct
@@ -82,9 +78,7 @@ public class Vision
     //
     // YCrCb Color Space.
     private static final int colorConversion = Imgproc.COLOR_RGB2YCrCb;
-    private static final double[] purplePixelColorThresholds = {60.0, 250.0, 120.0, 150.0, 140.0, 170.0};
-    private static final double[] greenPixelColorThresholds = {40.0, 200.0, 60.0, 120.0, 60.0, 120.0};
-    private static final double[] yellowPixelColorThresholds = {150.0, 250.0, 110.0, 160.0, 20.0, 100.0};
+    private static final double[] yellowSampleColorThresholds = {150.0, 250.0, 110.0, 160.0, 20.0, 100.0};
     private static final double[] whitePixelColorThresholds = {250.0, 255.0, 100.0, 130.0, 120.0, 140.0};
     private static final double[] redBlobColorThresholds = {20.0, 120.0, 180.0, 240.0, 90.0, 120.0};
     private static final double[] blueBlobColorThresholds = {20.0, 250.0, 40.0, 250.0, 160.0, 240.0};
@@ -107,12 +101,6 @@ public class Vision
             .setSolidityRange(0.0, 100.0)
             .setVerticesRange(0.0, 1000.0)
             .setAspectRatioRange(0.8, 1.25);
-    private static final String TFOD_MODEL_ASSET = "CenterStage.tflite";
-    private static final String TFOD_MODEL_FILENAME = "TrcCenterStage.tflite";
-    private static final float TFOD_MIN_CONFIDENCE = 0.90f;
-    public static final String TFOD_PIXEL_LABEL = "Pixel";
-    public static final String[] TFOD_FIRST_LABELS = {TFOD_PIXEL_LABEL};
-    public static final String[] TFOD_TRC_LABELS = {"Yellow Pixel", "Purple Pixel", "White Pixel", "Green Pixel"};
 
     private final TrcDbgTrace tracer;
     private final Robot robot;
@@ -121,27 +109,18 @@ public class Vision
     public FtcRawEocvVision rawColorBlobVision;
     public FtcVisionAprilTag aprilTagVision;
     private AprilTagProcessor aprilTagProcessor;
-    public FtcVisionEocvColorBlob purplePixelVision;
-    private FtcEocvColorBlobProcessor purplePixelProcessor;
-    public FtcVisionEocvColorBlob greenPixelVision;
-    private FtcEocvColorBlobProcessor greenPixelProcessor;
-    public FtcVisionEocvColorBlob yellowPixelVision;
-    private FtcEocvColorBlobProcessor yellowPixelProcessor;
-    public FtcVisionEocvColorBlob whitePixelVision;
-    private FtcEocvColorBlobProcessor whitePixelProcessor;
+    public FtcVisionEocvColorBlob yellowSampleVision;
+    private FtcEocvColorBlobProcessor yellowSampleProcessor;
     public FtcVisionEocvColorBlob redBlobVision;
     private FtcEocvColorBlobProcessor redBlobProcessor;
     public FtcVisionEocvColorBlob blueBlobVision;
     private FtcEocvColorBlobProcessor blueBlobProcessor;
     public FtcVisionTensorFlow tensorFlowVision;
-    //private TfodProcessor tensorFlowProcessor;
     public FtcVision vision;
     private int lastTeamPropPos = 0;
 
     /**
-     * Constructor: Create an instance of the object.
-     *
-     * @param robot specifies the robot object.
+     * Constructor: Create an instance of the object.@param robot specifies the robot object.
      */
     public Vision(Robot robot)
     {
@@ -233,9 +212,7 @@ public class Vision
     }   //Vision
 
     /**
-     * This method returns the front webcam.
-     *
-     * @return front webcam.
+     * This method returns the front webcam.@return front webcam.
      */
     public WebcamName getFrontWebcam()
     {
@@ -243,9 +220,7 @@ public class Vision
     }   //getFrontWebcam
 
     /**
-     * This method returns the rear webcam.
-     *
-     * @return rear webcam.
+     * This method returns the rear webcam.@return rear webcam.
      */
     public WebcamName getRearWebcam()
     {
@@ -253,9 +228,7 @@ public class Vision
     }   //getRearWebcam
 
     /**
-     * This method returns the active camera if we have two webcams.
-     *
-     * @return active camera.
+     * This method returns the active camera if we have two webcams.@return active camera.
      */
     public WebcamName getActiveWebcam()
     {
@@ -263,9 +236,7 @@ public class Vision
     }   //getActiveWebcam
 
     /**
-     * This method sets the active webcam.
-     *
-     * @param webcam specifies the webcam to be set as active.
+     * This method sets the active webcam.@param webcam specifies the webcam to be set as active.
      */
     public void setActiveWebcam(WebcamName webcam)
     {
@@ -274,7 +245,6 @@ public class Vision
 
     /**
      * This method displays the exposure settings on the dashboard. This helps tuning camera exposure.
-     *
      * @param lineNum specifies the dashboard line number to display the info.
      */
     public void displayExposureSettings(int lineNum)
@@ -292,7 +262,6 @@ public class Vision
 
     /**
      * This method returns the color threshold values of rawColorBlobVision.
-     *
      * @return array of color threshold values.
      */
     public double[] getRawColorBlobThresholds()
@@ -302,7 +271,6 @@ public class Vision
 
     /**
      * This method sets the color threshold values of rawColorBlobVision.
-     *
      * @param colorThresholds specifies an array of color threshold values.
      */
     public void setRawColorBlobThresholds(double... colorThresholds)
@@ -316,7 +284,6 @@ public class Vision
 
     /**
      * This method enables/disables raw ColorBlob vision.
-     *
      * @param enabled specifies true to enable, false to disable.
      */
     public void setRawColorBlobVisionEnabled(boolean enabled)
@@ -329,7 +296,6 @@ public class Vision
 
     /**
      * This method checks if raw ColorBlob vision is enabled.
-     *
      * @return true if enabled, false if disabled.
      */
     public boolean isRawColorBlobVisionEnabled()
@@ -339,7 +305,6 @@ public class Vision
 
     /**
      * This method calls RawColorBlob vision to detect the color blob for color threshold tuning.
-     *
      * @param lineNum specifies the dashboard line number to display the detected object info, -1 to disable printing.
      * @return detected raw color blob object info.
      */
@@ -358,7 +323,6 @@ public class Vision
 
     /**
      * This method enables/disables AprilTag vision.
-     *
      * @param enabled specifies true to enable, false to disable.
      */
     public void setAprilTagVisionEnabled(boolean enabled)
@@ -457,96 +421,61 @@ public class Vision
 
     /**
      * This method enables/disables vision for the specified pixel type.
-     *
-     * @param pixelType specifies the pixel type to be detected.
+     * @param sampleType specifies the pixel type to be detected.
      * @param enabled specifies true to enable, false to disable.
      */
-    public void setPixelVisionEnabled(SampleType pixelType, boolean enabled)
+    public void setSampleVisionEnabled(SampleType sampleType, boolean enabled)
     {
-        switch (pixelType)
+        switch (sampleType)
         {
-            case PurplePixel:
-                if (purplePixelProcessor != null)
+            case YellowSample:
+                if (yellowSampleProcessor != null)
                 {
-                    vision.setProcessorEnabled(purplePixelProcessor, enabled);
+                    vision.setProcessorEnabled(yellowSampleProcessor, enabled);
                 }
                 break;
-
-            case GreenPixel:
-                if (greenPixelProcessor != null)
+            case RedSample:
+                if (redBlobProcessor != null)
                 {
-                    vision.setProcessorEnabled(greenPixelProcessor, enabled);
+                    vision.setProcessorEnabled(redBlobProcessor, enabled);
                 }
                 break;
-
-            case YellowPixel:
-                if (yellowPixelProcessor != null)
+            case BlueSample:
+                if (blueBlobProcessor != null)
                 {
-                    vision.setProcessorEnabled(yellowPixelProcessor, enabled);
-                }
-                break;
-
-            case WhitePixel:
-                if (whitePixelProcessor != null)
-                {
-                    vision.setProcessorEnabled(whitePixelProcessor, enabled);
-                }
-                break;
-
-            case AnyPixel:
-                if (purplePixelProcessor != null)
-                {
-                    vision.setProcessorEnabled(purplePixelProcessor, enabled);
-                }
-                if (greenPixelProcessor != null)
-                {
-                    vision.setProcessorEnabled(greenPixelProcessor, enabled);
-                }
-                if (yellowPixelProcessor != null)
-                {
-                    vision.setProcessorEnabled(yellowPixelProcessor, enabled);
-                }
-                if (whitePixelProcessor != null)
-                {
-                    vision.setProcessorEnabled(whitePixelProcessor, enabled);
+                    vision.setProcessorEnabled(blueBlobProcessor, enabled);
                 }
                 break;
         }
-    }   //setPixelVisionEnabled
+    }   //setSampleVisionEnabled
 
     /**
      * This method checks if vision is enabled for the specified pixel type.
-     *
-     * @param pixelType specifies the pixel type to be detected.
+     * @param sampleType specifies the pixel type to be detected.
      * @return true if enabled, false if disabled.
      */
-    public boolean isPixelVisionEnabled(SampleType pixelType)
+    public boolean isPixelVisionEnabled(SampleType sampleType)
     {
         boolean enabled = false;
 
-        switch (pixelType)
+        switch (sampleType)
         {
-            case PurplePixel:
-                enabled = purplePixelProcessor != null && vision.isVisionProcessorEnabled(purplePixelProcessor);
+            case RedSample:
+                enabled = redBlobProcessor != null && vision.isVisionProcessorEnabled(redBlobProcessor);
                 break;
 
-            case GreenPixel:
-                enabled = greenPixelProcessor != null && vision.isVisionProcessorEnabled(greenPixelProcessor);
+            case BlueSample:
+                enabled = blueBlobProcessor != null && vision.isVisionProcessorEnabled(blueBlobProcessor);
                 break;
 
-            case YellowPixel:
-                enabled = yellowPixelProcessor != null && vision.isVisionProcessorEnabled(yellowPixelProcessor);
+            case YellowSample:
+                enabled = yellowSampleProcessor != null && vision.isVisionProcessorEnabled(yellowSampleProcessor);
                 break;
 
-            case WhitePixel:
-                enabled = whitePixelProcessor != null && vision.isVisionProcessorEnabled(whitePixelProcessor);
-                break;
-
-            case AnyPixel:
-                enabled = purplePixelProcessor != null && vision.isVisionProcessorEnabled(purplePixelProcessor) ||
-                          greenPixelProcessor != null && vision.isVisionProcessorEnabled(greenPixelProcessor) ||
-                          yellowPixelProcessor != null && vision.isVisionProcessorEnabled(yellowPixelProcessor) ||
-                          whitePixelProcessor != null && vision.isVisionProcessorEnabled(whitePixelProcessor);
+            case AnySample:
+                enabled = redBlobProcessor != null && vision.isVisionProcessorEnabled(redBlobProcessor) ||
+                          blueBlobProcessor != null && vision.isVisionProcessorEnabled(blueBlobProcessor) ||
+                          yellowSampleProcessor != null && vision.isVisionProcessorEnabled(yellowSampleProcessor);
                 break;
         }
 
@@ -555,68 +484,28 @@ public class Vision
 
     /**
      * This method calls ColorBlob vision to detect the specified Pixel object.
-     *
-     * @param pixelType specifies the pixel type to be detected.
+     * @param sampleType specifies the pixel type to be detected.
      * @param lineNum specifies the dashboard line number to display the detected object info, -1 to disable printing.
      * @return detected Purple Pixel object info.
      */
     public TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> getDetectedPixel(
-        SampleType pixelType, int lineNum)
+        SampleType sampleType, int lineNum)
     {
         TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject> pixelInfo = null;
         String pixelName = null;
 
-        switch (pixelType)
+        switch (sampleType)
         {
-            case PurplePixel:
-                pixelInfo = purplePixelVision != null? purplePixelVision.getBestDetectedTargetInfo(
+            case YellowSample:
+                pixelInfo = yellowSampleVision != null? yellowSampleVision.getBestDetectedTargetInfo(
                     this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                pixelName = BlinkinLEDs.PURPLE_PIXEL;
+                pixelName = BlinkinLEDs.YELLOW_SAMPLE;
                 break;
 
-            case GreenPixel:
-                pixelInfo = greenPixelVision != null? greenPixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                pixelName = BlinkinLEDs.GREEN_PIXEL;
-                break;
-
-            case YellowPixel:
-                pixelInfo = yellowPixelVision != null? yellowPixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                pixelName = BlinkinLEDs.YELLOW_PIXEL;
-                break;
-
-            case WhitePixel:
-                pixelInfo = whitePixelVision != null? whitePixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                pixelName = BlinkinLEDs.WHITE_PIXEL;
-                break;
-
-            case AnyPixel:
+            case AnySample:
                 ArrayList<TrcVisionTargetInfo<TrcOpenCvColorBlobPipeline.DetectedObject>> pixelList = new ArrayList<>();
 
-                pixelInfo = purplePixelVision != null? purplePixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                if (pixelInfo != null)
-                {
-                    pixelList.add(pixelInfo);
-                }
-
-                pixelInfo = greenPixelVision != null? greenPixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                if (pixelInfo != null)
-                {
-                    pixelList.add(pixelInfo);
-                }
-
-                pixelInfo = yellowPixelVision != null? yellowPixelVision.getBestDetectedTargetInfo(
-                    this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                if (pixelInfo != null)
-                {
-                    pixelList.add(pixelInfo);
-                }
-
-                pixelInfo = whitePixelVision != null? whitePixelVision.getBestDetectedTargetInfo(
+                pixelInfo = yellowSampleVision != null? yellowSampleVision.getBestDetectedTargetInfo(
                     this::validatePixel, this::compareDistance, 0.0, 0.0): null;
                 if (pixelInfo != null)
                 {
@@ -650,9 +539,7 @@ public class Vision
     }   //getDetectedPixel
 
     /**
-     * This method enables/disables RedBlob vision.
-     *
-     * @param enabled specifies true to enable, false to disable.
+     * This method enables/disables RedBlob vision. @param enabled specifies true to enable, false to disable.
      */
     public void setRedBlobVisionEnabled(boolean enabled)
     {
@@ -663,9 +550,7 @@ public class Vision
     }   //setRedBlobVisionEnabled
 
     /**
-     * This method checks if RedBlob vision is enabled.
-     *
-     * @return true if enabled, false if disabled.
+     * This method checks if RedBlob vision is enabled.@return true if enabled, false if disabled.
      */
     public boolean isRedBlobVisionEnabled()
     {
@@ -673,9 +558,7 @@ public class Vision
     }   //isRedBlobVisionEnabled
 
     /**
-     * This method enables/disables BlueBlob vision.
-     *
-     * @param enabled specifies true to enable, false to disable.
+     * This method enables/disables BlueBlob vision.@param enabled specifies true to enable, false to disable.
      */
     public void setBlueBlobVisionEnabled(boolean enabled)
     {
@@ -686,9 +569,7 @@ public class Vision
     }   //setBlueBlobVisionEnabled
 
     /**
-     * This method checks if BlueBlob vision is enabled.
-     *
-     * @return true if enabled, false if disabled.
+     * This method checks if BlueBlob vision is enabled. @return true if enabled, false if disabled.
      */
     public boolean isBlueBlobVisionEnabled()
     {
@@ -697,7 +578,6 @@ public class Vision
 
     /**
      * This method detects the team prop and determine its position.
-     *
      * @param alliance specifies the alliance color to look for team prop.
      * @param lineNum specifies the dashboard line number to display the detected object info, -1 to disable printing.
      * @return team prop position 1, 2, or 3, 0 if not found.
@@ -771,7 +651,6 @@ public class Vision
 
     /**
      * This method returns the last detected team prop position.
-     *
      * @return last team prop position, 0 if never detected it.
      */
     public int getLastDetectedTeamPropPosition()
@@ -781,7 +660,6 @@ public class Vision
 
     /**
      * This method enables/disables TensorFlow vision.
-     *
      * @param enabled specifies true to enable, false to disable.
      */
     public void setTensorFlowVisionEnabled(boolean enabled)
@@ -792,45 +670,8 @@ public class Vision
         }*/
     }   //setTensorFlowVisionEnabled
 
-    /**
-     * This method checks if TensorFlow vision is enabled.
-     *
-     * @return true if enabled, false if disabled.
-     */
-    /*public boolean isTensorFlowVisionEnabled()
-    {
-        return tensorFlowProcessor != null && vision.isVisionProcessorEnabled(tensorFlowProcessor);
-    }  */ //isTensorFlowVisionEnabled
-
-    /**
-     * This method calls TensorFlow vision to detect the Pixel objects.
-     *
-     * @param lineNum specifies the dashboard line number to display the detected object info, -1 to disable printing.
-     * @return detected Pixel object info.
-     */
-    /*public TrcVisionTargetInfo<FtcVisionTensorFlow.DetectedObject> getDetectedTensorFlowPixel(int lineNum)
-    {
-        TrcVisionTargetInfo<FtcVisionTensorFlow.DetectedObject> tensorFlowInfo =
-            tensorFlowVision.getBestDetectedTargetInfo(
-                Vision.TFOD_PIXEL_LABEL, null, this::compareConfidence, 0.0, 0.0);
-
-        if (tensorFlowInfo != null && robot.blinkin != null)
-        {
-            robot.blinkin.setDetectedPattern(BlinkinLEDs.TENSOR_FLOW);
-        }
-
-        if (lineNum != -1)
-        {
-            robot.dashboard.displayPrintf(
-                lineNum, "TensorFlow: %s", tensorFlowInfo != null? tensorFlowInfo: "Not found.");
-        }
-
-        return tensorFlowInfo;
-    }   //getDetectedTensorFlowPixel
-*/
-    /**
+     /**
      * This method validates the detected pixel is really a pixel by checking its physical width to be about 3 inches.
-     *
      * @param pixelInfo specifies the detected pixel info object.
      * @return true if it passes the test, false otherwise.
      */
@@ -842,7 +683,6 @@ public class Vision
 
     /**
      * This method is called by the Arrays.sort to sort the target object by increasing distance.
-     *
      * @param a specifies the first target
      * @param b specifies the second target.
      * @return negative value if a has closer distance than b, 0 if a and b have equal distances, positive value
@@ -857,7 +697,6 @@ public class Vision
 
     /**
      * This method is called by the Arrays.sort to sort the target object by decreasing confidence.
-     *
      * @param a specifies the first target
      * @param b specifies the second target.
      * @return negative value if a has higher confidence than b, 0 if a and b have equal confidence, positive value

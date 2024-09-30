@@ -1,24 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 
 package teamcode.subsystems;
 
@@ -35,9 +14,7 @@ public class SampleTray
     private boolean lowerGateOpened, upperGateOpened;
 
     /**
-     * Constructor: Creates an instance of the object.
-     *
-     * @param instanceName specifies the hardware name.
+     * Constructor: Creates an instance of the object.@param instanceName specifies the hardware name.
      */
     public SampleTray(String instanceName)
     {
@@ -48,9 +25,7 @@ public class SampleTray
     }   //PixelTray
 
     /**
-     * This method returns the state info of the Pixel Tray in string format.
-     *
-     * @return state info of the Pixel Tray.
+     * This method returns the state info of the Pixel Tray in string format.@return state info of the Pixel Tray.
      */
     @Override
     public String toString()
@@ -60,7 +35,6 @@ public class SampleTray
 
     /**
      * This method opens and closes the pixel lower gate.
-     *
      * @param opened specifies true to open the gate, false to close.
      * @param event specifies the event to signal after open/close wait time expired.
      */
@@ -84,7 +58,6 @@ public class SampleTray
 
     /**
      * This method returns the state of the lower gate.
-     *
      * @return true if gate is opened, false if closed.
      */
     public boolean isLowerGateOpened()
@@ -94,7 +67,6 @@ public class SampleTray
 
     /**
      * This method opens and closes the pixel upper gate.
-     *
      * @param opened specifies true to open the gate, false to close.
      * @param event specifies the event to signal after open/close wait time expired.
      */
@@ -118,7 +90,6 @@ public class SampleTray
 
     /**
      * This method returns the state of the upper gate.
-     *
      * @return true if gate is opened, false if closed.
      */
     public boolean isUpperGateOpened()

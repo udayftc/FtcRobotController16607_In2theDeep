@@ -41,8 +41,6 @@ public class CmdAuto implements TrcRobot.RobotCommand
     private enum State
     {
         START,
-        PLACE_PURPLE_PIXEL,
-        DRIVE_TO_STACK,
         PICKUP_SAMPLE,
         DO_DELAY,
         DRIVE_TO_LOOKOUT,
@@ -75,13 +73,8 @@ public class CmdAuto implements TrcRobot.RobotCommand
         sm.start(State.START);
     }   //CmdAuto
 
-    //
-    // Implements the TrcRobot.RobotCommand interface.
-    //
-
     /**
      * This method checks if the current RobotCommand  is running.
-     *
      * @return true if the command is running, false otherwise.
      */
     @Override
@@ -102,7 +95,6 @@ public class CmdAuto implements TrcRobot.RobotCommand
 
     /**
      * This method must be called periodically by the caller to drive the command sequence forward.
-     *
      * @param elapsedTime specifies the elapsed time in seconds since the start of the robot mode.
      * @return true if the command sequence is completed, false otherwise.
      */
@@ -181,41 +173,7 @@ public class CmdAuto implements TrcRobot.RobotCommand
                     }
                     robot.robotDrive.purePursuitDrive.start(
                         event, robot.robotDrive.driveBase.getFieldPosition(), false, intermediate1, targetPose);
-                    sm.waitForSingleEvent(event, State.PLACE_PURPLE_PIXEL);
-                    break;
-
-                case PLACE_PURPLE_PIXEL:
-                    // Place purple pixel on the spike mark position 1, 2 or 3.
-                    if (robot.intake != null)
-                    {
-                        robot.intake.setOn(0.0, 0.6, 1.0, event);
-                        sm.waitForSingleEvent(event, State.DRIVE_TO_STACK);
-                    }
-                    else
-                    {
-                        // Intake does not exist, skip placing purple pixel.
-                        sm.setState(State.DRIVE_TO_STACK);
-                    }
-                    break;
-
-                case DRIVE_TO_STACK:
-                    robot.robotDrive.purePursuitDrive.setMoveOutputLimit(0.5);
-                    if (autoChoices.strategy == FtcAuto.AutoStrategy.AUTO_SCORE_2PLUS1)
-                    {
-                        robot.sampleTray.setUpperGateOpened(true, null);
-                        intermediate1 = robot.adjustPoseByAlliance(-1.6, 2.5, 180.0, autoChoices.alliance);
-                        intermediate2 = robot.adjustPoseByAlliance(-2.3, 2.5, 180.0, autoChoices.alliance);
-                        intermediate3 = robot.adjustPoseByAlliance(-2.3, 0.3, 180.0, autoChoices.alliance);
-                        targetPose = robot.adjustPoseByAlliance(-2.1, 0.6, -90.0, autoChoices.alliance);
-                        robot.robotDrive.purePursuitDrive.start(
-                            event, robot.robotDrive.driveBase.getFieldPosition(), false,
-                            intermediate1, intermediate2, intermediate3, targetPose);
-                        sm.waitForSingleEvent(event, State.PICKUP_SAMPLE);
-                    }
-                    else
-                    {
-                        sm.setState(State.DO_DELAY);
-                    }
+                    //sm.waitForSingleEvent(event, State.PLACE_PURPLE_PIXEL);
                     break;
 
                 case PICKUP_SAMPLE:
