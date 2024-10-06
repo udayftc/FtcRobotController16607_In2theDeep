@@ -174,11 +174,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        double joystickX = gamepad1.right_stick_x;  // Joystick X-axis (left/right strafing)
-        double joystickY = gamepad1.left_stick_y;  // Joystick Y-axis (forward/backward)
+        double joystickX = gamepad1.right_stick_y;  // Joystick X-axis (left/right strafing)
+        double joystickY = gamepad1.right_stick_x;  // Joystick Y-axis (forward/backward)
         double omega = gamepad1.left_stick_x;  // Joystick rotation input (turning)
         double heading = Math.toRadians(yawDegrees);
-        double L = 0.3;  // half of the diagonal distance between wheels
+        double L = 0.24;  // half of the diagonal distance between wheels
         double vx = joystickX * Math.cos(heading) - joystickY * Math.sin(heading);
         double vy = joystickX * Math.sin(heading) + joystickY * Math.cos(heading);
 
