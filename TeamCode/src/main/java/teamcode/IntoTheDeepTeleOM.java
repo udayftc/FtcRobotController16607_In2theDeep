@@ -113,7 +113,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
         limelight.start();
     }
-    public void run_navx() {
+    public float run_navx() {
         // Read dimensionalized data from the gyro. This gyro can report angular velocities
         // about all three axes. Additionally, it internally integrates the Z axis to
         // be able to report an absolute angular Z orientation.
@@ -130,6 +130,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
                 .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
                 .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
         telemetry.update();
+        return angles.firstAngle;
     }
     public void init_motors() {
         Intake = hardwareMap.get(Servo.class, "Test");
@@ -169,13 +170,13 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.update();
     }
-    public void Mecanumdrive(double yawDegrees) {
+    public void Mecanumdriveyaw(double yawDegrees) {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
 
         double joystickX = gamepad1.right_stick_x;  // Joystick X-axis (left/right strafing)
-        double joystickY = gamepad1.right_stick_y;  // Joystick Y-axis (forward/backward)
-        double omega = 0.0;  // Joystick rotation input (turning)
+        double joystickY = gamepad1.left_stick_y;  // Joystick Y-axis (forward/backward)
+        double omega = gamepad1.left_stick_x;  // Joystick rotation input (turning)
         double heading = Math.toRadians(yawDegrees);
         double L = 0.3;  // half of the diagonal distance between wheels
         double vx = joystickX * Math.cos(heading) - joystickY * Math.sin(heading);
@@ -319,10 +320,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            run_navx();
+            float yawDegrees = run_navx();
             run_LL();
-
-            Mecanumdrive();
+            telemetry.addData("yawreturned", yawDegrees);
+            telemetry.update();
+            Mecanumdriveyaw (yawDegrees);
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
                 Intake.setPosition(0);
