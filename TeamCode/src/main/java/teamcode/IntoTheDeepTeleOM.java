@@ -37,21 +37,138 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     private Servo Intake;
     private Servo Drone;
     private Servo Servoarm;
+    private DcMotor arm;
 
     private Limelight3A limelight;
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
-
-    int flencoderpos = 0;
-    int frencoderpos = 0;
-    int blencoderpos = 0;
-    int brencoderpos = 0;
+    private int armhighpos = 500;
+    private int armlowpos = 100;
+    private int ladderhighpos = 2650;
+    private int laddermidpos = 500;
+    private int ladderlowpos = 0;
+	private int flencoderpos = 0;
+    private int frencoderpos = 0;
+    private int blencoderpos = 0;
+    private int brencoderpos = 0;
 
     ElapsedTime timer = new ElapsedTime();
+
+    public void init_LL() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
+        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
+        limelight.start();
+    }
+    public void run_LL() {
+        LLStatus status = limelight.getStatus();
+        //telemetry.addData("Name", "%s",
+        //        status.getName());
+//        telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
+//                status.getTemp(), status.getCpu(),(int)status.getFps());
+        //telemetry.addData("Pipeline", "Index: %d, Type: %s",
+        //        status.getPipelineIndex(), status.getPipelineType());
+
+        LLResult result = limelight.getLatestResult();
+        if (result != null) {
+            // Access general information
+            Pose3D botpose = result.getBotpose();
+            double captureLatency = result.getCaptureLatency();
+            double targetingLatency = result.getTargetingLatency();
+            double parseLatency = result.getParseLatency();
+//            telemetry.addData("LL Latency", captureLatency + targetingLatency);
+//            telemetry.addData("Parse Latency", parseLatency);
+//            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+
+            if (result.isValid()) {
+            //    telemetry.addData("tx", result.getTx());
+            //    telemetry.addData("txnc", result.getTxNC());
+            //    telemetry.addData("ty", result.getTy());
+            //    telemetry.addData("tync", result.getTyNC());
+
+            //    telemetry.addData("Botpose", botpose.toString());
+
+                // Access barcode results
+                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
+                for (LLResultTypes.BarcodeResult br : barcodeResults) {
+//                    telemetry.addData("Barcode", "Data: %s", br.getData());
+                }
+
+                // Access classifier results
+                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
+                for (LLResultTypes.ClassifierResult cr : classifierResults) {
+                    //telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
+                }
+
+                // Access detector results
+                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
+                for (LLResultTypes.DetectorResult dr : detectorResults) {
+                    //telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
+                }
+
+                // Access fiducial results
+                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
+                for (LLResultTypes.FiducialResult fr : fiducialResults) {
+                   // telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(),fr.getTargetXDegrees(), fr.getTargetYDegrees());
+                }
+
+                // Access color results
+                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
+                for (LLResultTypes.ColorResult cr : colorResults) {
+                    //telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
+                }
+            }
+        } else {
+            //telemetry.addData("Limelight", "No data available");
+        }
+    }
+
+    public void init_navx() throws InterruptedException {
+        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
+        gyro = (IntegratingGyroscope) navxMicro;
+        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        // Wait until the gyro calibration is complete
+        timer.reset();
+        while (navxMicro.isCalibrating()) {
+            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
+            telemetry.update();
+            //noinspection BusyWait
+            Thread.sleep(50);
+        }
+        telemetry.log().clear();
+        telemetry.log().add("Gyro Calibrated.");
+        telemetry.clear();
+        telemetry.update();
+    }
+    public float run_navx() {
+        // Read dimensionalized data from the gyro. This gyro can report angular velocities
+        // about all three axes. Additionally, it internally integrates the Z axis to
+        // be able to report an absolute angular Z orientation.
+        AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
+        Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+/**
+        telemetry.addLine()
+                .addData("dx", formatRate(rates.xRotationRate))
+                .addData("dy", formatRate(rates.yRotationRate))
+                .addData("dz", "%s deg/s", formatRate(rates.zRotationRate));
+*/
+       /* telemetry.addLine()
+                .addData("heading", formatAngle(angles.angleUnit, angles.firstAngle));
+//                .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
+//                .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
+        telemetry.update();*/
+        return angles.firstAngle;
+    }
 
     public void init_motors() {
         Intake = hardwareMap.get(Servo.class, "Intake");
         Servoarm = hardwareMap.get(Servo.class, "Servoarm");
+        arm = hardwareMap.get(DcMotor.class, "arm");
+        arm.setDirection(DcMotor.Direction.REVERSE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setPower(0.0);
         Drone = hardwareMap.get(Servo.class, "Drone");
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
         Backright = hardwareMap.get(DcMotor.class, "Backright");
@@ -87,119 +204,39 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         telemetry.update();
     }
-    public void init_LL() {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        telemetry.setMsTransmissionInterval(11);
-        limelight.pipelineSwitch(0);
-        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
-        limelight.start();
+
+    public void Mecanumdriveyaw(double yawDegrees) {
+        Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
+        Backright.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        double joystickX = gamepad1.right_stick_y;  // Joystick X-axis (left/right strafing)
+        double joystickY = -gamepad1.right_stick_x;  // Joystick Y-axis (forward/backward)
+        double omega = -gamepad1.left_stick_x*2;  // Joystick rotation input (turning)
+        double heading = Math.toRadians(yawDegrees);
+        double L = 0.24;  // half of the diagonal distance between wheels
+        double vx = joystickX * Math.cos(heading) - joystickY * Math.sin(heading);
+        double vy = joystickX * Math.sin(heading) + joystickY * Math.cos(heading);
+
+        double powerFL = vx + vy + omega * L;  // Front Left
+        double powerFR = vx - vy - omega * L;  // Front Right
+        double powerBL = vx - vy + omega * L;  // Back Left
+        double powerBR = vx + vy - omega * L;  // Back Right
+// Normalize motor powers to ensure none exceed [-1, 1]
+        double maxPower = Math.max(Math.max(Math.abs(powerFL), Math.abs(powerFR)),
+                Math.max(Math.abs(powerBL), Math.abs(powerBR)));
+        if (maxPower > 1.0) {
+            powerFL /= maxPower;
+            powerFR /= maxPower;
+            powerBL /= maxPower;
+            powerBR /= maxPower;  }
+        Frontleft.setPower(powerFL);
+        Frontright.setPower(powerFR);
+        Backleft.setPower(powerBL);
+        Backright.setPower(powerBR);
     }
-    public void run_LL() {
-        LLStatus status = limelight.getStatus();
-        telemetry.addData("Name", "%s",
-                status.getName());
-        telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-                status.getTemp(), status.getCpu(),(int)status.getFps());
-        telemetry.addData("Pipeline", "Index: %d, Type: %s",
-                status.getPipelineIndex(), status.getPipelineType());
-
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            // Access general information
-            Pose3D botpose = result.getBotpose();
-            double captureLatency = result.getCaptureLatency();
-            double targetingLatency = result.getTargetingLatency();
-            double parseLatency = result.getParseLatency();
-            telemetry.addData("LL Latency", captureLatency + targetingLatency);
-            telemetry.addData("Parse Latency", parseLatency);
-            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
-
-            if (result.isValid()) {
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("txnc", result.getTxNC());
-                telemetry.addData("ty", result.getTy());
-                telemetry.addData("tync", result.getTyNC());
-
-                telemetry.addData("Botpose", botpose.toString());
-
-                // Access barcode results
-                List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
-                for (LLResultTypes.BarcodeResult br : barcodeResults) {
-                    telemetry.addData("Barcode", "Data: %s", br.getData());
-                }
-
-                // Access classifier results
-                List<LLResultTypes.ClassifierResult> classifierResults = result.getClassifierResults();
-                for (LLResultTypes.ClassifierResult cr : classifierResults) {
-                    telemetry.addData("Classifier", "Class: %s, Confidence: %.2f", cr.getClassName(), cr.getConfidence());
-                }
-
-                // Access detector results
-                List<LLResultTypes.DetectorResult> detectorResults = result.getDetectorResults();
-                for (LLResultTypes.DetectorResult dr : detectorResults) {
-                    telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
-                }
-
-                // Access fiducial results
-                List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-                for (LLResultTypes.FiducialResult fr : fiducialResults) {
-                    telemetry.addData("Fiducial", "ID: %d, Family: %s, X: %.2f, Y: %.2f", fr.getFiducialId(), fr.getFamily(),fr.getTargetXDegrees(), fr.getTargetYDegrees());
-                }
-
-                // Access color results
-                List<LLResultTypes.ColorResult> colorResults = result.getColorResults();
-                for (LLResultTypes.ColorResult cr : colorResults) {
-                    telemetry.addData("Color", "X: %.2f, Y: %.2f", cr.getTargetXDegrees(), cr.getTargetYDegrees());
-                }
-            }
-        } else {
-            telemetry.addData("Limelight", "No data available");
-        }
-    }
-    public void init_navx() throws InterruptedException {
-        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
-        gyro = (IntegratingGyroscope) navxMicro;
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
-        // Wait until the gyro calibration is complete
-        timer.reset();
-        while (navxMicro.isCalibrating()) {
-            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
-            telemetry.update();
-            //noinspection BusyWait
-            Thread.sleep(50);
-        }
-        telemetry.log().clear();
-        telemetry.log().add("Gyro Calibrated.");
-        telemetry.clear();
-        telemetry.update();
-    }
-    public void run_navx() {
-        // Read dimensionalized data from the gyro. This gyro can report angular velocities
-        // about all three axes. Additionally, it internally integrates the Z axis to
-        // be able to report an absolute angular Z orientation.
-        AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
-        Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        telemetry.addLine()
-                .addData("dx", formatRate(rates.xRotationRate))
-                .addData("dy", formatRate(rates.yRotationRate))
-                .addData("dz", "%s deg/s", formatRate(rates.zRotationRate));
-
-        telemetry.addLine()
-                .addData("heading", formatAngle(angles.angleUnit, angles.firstAngle))
-                .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
-                .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
-        telemetry.update();
-    }
-
     public void Mecanumdrive() {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
-        frencoderpos = Frontright.getCurrentPosition();
-        brencoderpos = Backright.getCurrentPosition();
-        flencoderpos = Frontleft.getCurrentPosition();
-        blencoderpos = Backleft.getCurrentPosition();
-
         double h = Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
         double robotAngle = Math.atan2(gamepad1.right_stick_y, gamepad1.right_stick_x) - Math.PI / 4;
         double rightX = gamepad1.left_stick_x;
@@ -217,55 +254,40 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     public void Hook_Zero_Pwr_Behavior() {
         Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-
     public void ladder_run_to_position0() {
-        int tgt0Position = 6;
+        int tgt0Position = ladderlowpos;
+        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgt0Position);
-        LadderLift.setPower(0.1);
+        LadderLift.setPower(1);
         LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LadderLift.isBusy()) {
             telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
             telemetry.update();
         }
     }
-
     public void ladder_run_to_position1() {
-        int tgt1Position = 150;
+        int tgt1Position = laddermidpos;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgt1Position);
-        LadderLift.setPower(0.5);
+        LadderLift.setPower(1);
         LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LadderLift.isBusy()) {
             telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
             telemetry.update();
         }
     }
-
-    public void ladder_run_to_position2() {
-        int tgt2Position = 300;
-        LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt2Position);
-        LadderLift.setPower(0.5);
-        LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (LadderLift.isBusy()) {
-            telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-
     public void ladder_run_to_position3() {
-        int tgt3Position = 600;
+        int tgt3Position = ladderhighpos;
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgt3Position);
-        LadderLift.setPower(0.8);
+        LadderLift.setPower(1);
         LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LadderLift.isBusy()) {
             telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
             telemetry.update();
         }
     }
-
     public void hook_run_to_high_position() {
         int tgthPosition = 8400;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -277,7 +299,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             telemetry.update();
         }
     }
-
     public void hook_run_to_zero_position() {
         int tgthlPosition = 40;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -290,6 +311,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         }
         Hook_Zero_Pwr_Behavior();
     }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -308,10 +330,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            run_navx();
+            float yawDegrees = run_navx();
             run_LL();
-
-            Mecanumdrive();
+            //telemetry.addData("yawreturned", yawDegrees);
+            //telemetry.update();
+            Mecanumdriveyaw (yawDegrees);
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
                 Intake.setPosition(0);
@@ -322,9 +345,27 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             } else if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
             } else if (gamepad1.dpad_up) {
-                hook_run_to_high_position();
+                //hook_run_to_high_position();
+                arm.setDirection(DcMotorSimple.Direction.FORWARD);
+                arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm.setTargetPosition(armhighpos);
+                arm.setPower(1.0);
+                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (arm.isBusy()) {
+                    telemetry.addData("arm Pos:", arm.getCurrentPosition());
+                    telemetry.update();
+                }
             } else if (gamepad1.dpad_down) {
-                hook_run_to_zero_position();
+                //hook_run_to_zero_position();
+               // arm.setDirection(DcMotorSimple.Direction.REVERSE);
+                //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm.setTargetPosition(armlowpos);
+                arm.setPower(1.0);
+                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (arm.isBusy()) {
+                    telemetry.addData("arm Pos:", arm.getCurrentPosition());
+                    telemetry.update();
+                }
             }
 
             /* LadderLift positions */ /* Drone Positions */
@@ -332,8 +373,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
                 ladder_run_to_position0();
             } else if (gamepad2.x) {
                 ladder_run_to_position1();
-            } else if (gamepad2.b) {
-                ladder_run_to_position2();
             } else if (gamepad2.y) {
                 ladder_run_to_position3();
             } else if (gamepad2.left_bumper) {
