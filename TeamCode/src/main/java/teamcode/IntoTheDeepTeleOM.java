@@ -242,7 +242,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     public void ladder_run_to_position(int tgtposition) {
-        //LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgtposition);
         LadderLift.setPower(1);
