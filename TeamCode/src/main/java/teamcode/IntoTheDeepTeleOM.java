@@ -131,7 +131,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         while (navxMicro.isCalibrating()) {
             telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
             telemetry.update();
-            //noinspection BusyWait
+            /*noinspection BusyWait */
             Thread.sleep(50);
         }
         telemetry.log().clear();
