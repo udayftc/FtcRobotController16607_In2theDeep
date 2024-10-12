@@ -42,11 +42,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
 
-    private int armhighpos = 100;
+    private int armhighpos = 450;
     private int armlowpos = 30;
-    private int ladderhighpos = 2000;
+    private int ladderhighpos = 1900;
     private int ladderlowpos = 0;
-	private int laddermidpos = 300;
+	private int laddermidpos = 850;
     private int tgthPosition = 8400;
     private int tgthlPosition = 40;
 
@@ -254,7 +254,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     }
     public void ladder_run_to_position1() {
         int tgt1Position = laddermidpos;
-        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
+//        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgt1Position);
         LadderLift.setPower(1);
@@ -323,14 +323,13 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
                 Intake.setPosition(0);
-            } else if (gamepad1.dpad_right) {
+            } if (gamepad1.dpad_right) {
                 Intake.setPosition(1);
-            } else if (gamepad1.left_bumper) {
+            } if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
-            } else if (gamepad1.right_bumper) {
+            } if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
-            } else if (gamepad1.dpad_up) {
-                //hook_run_to_high_position();
+            } if (gamepad1.dpad_up) {
                 arm.setDirection(DcMotorSimple.Direction.FORWARD);
                 arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 arm.setTargetPosition(armhighpos);
@@ -340,10 +339,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
                     telemetry.addData("arm Pos:", arm.getCurrentPosition());
                     telemetry.update();
                 }
-            } else if (gamepad1.dpad_down) {
-                //hook_run_to_zero_position();
-               // arm.setDirection(DcMotorSimple.Direction.REVERSE);
-                //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            } if (gamepad1.dpad_down) {
                 arm.setTargetPosition(armlowpos);
                 arm.setPower(1.0);
                 arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -356,15 +352,12 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             /* LadderLift positions */ /* Drone Positions */
             if (gamepad2.a) {
                 ladder_run_to_position0();
-            } else if (gamepad2.x) {
+            } if (gamepad2.x) {
                 ladder_run_to_position1();
-            } else if (gamepad2.y) {
+            } if (gamepad2.y) {
                 ladder_run_to_position3();
-            } else if (gamepad2.left_bumper) {
-                Drone.setPosition(0);
-            } else if (gamepad2.right_bumper) {
-                Drone.setPosition(1);
             }
+
             telemetry.update();
             idle();
         }
