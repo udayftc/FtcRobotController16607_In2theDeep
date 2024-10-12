@@ -49,6 +49,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 	private int laddermidpos = 850;
     private int tgthPosition = 8400;
     private int tgthlPosition = 40;
+    private int tgtposition = 0;
 
     private int flencoderpos = 0;
     private int frencoderpos = 0;
@@ -155,12 +156,12 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
         Backleft.setDirection(DcMotorSimple.Direction.FORWARD);
         telemetry.addData("DcMotor DirectionBL", Backleft.getDirection());
-        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         telemetry.addData("DcMotor ModeBL:", Backleft.getCurrentPosition());
         Backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Backright = hardwareMap.get(DcMotor.class, "Backright");
         Backright.setDirection(DcMotorSimple.Direction.FORWARD);
-        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         telemetry.addData("DcMotor ModeBL:", Backright.getCurrentPosition());
         telemetry.addData("DcMotor DirectionBR", Backright.getDirection());
         Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -240,34 +241,10 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     public void Hook_Zero_Pwr_Behavior() {
         Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-    public void ladder_run_to_position0() {
-        int tgt0Position = ladderlowpos;
+    public void ladder_run_to_position(int tgtposition) {
         //LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt0Position);
-        LadderLift.setPower(1);
-        LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (LadderLift.isBusy()) {
-            telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    public void ladder_run_to_position1() {
-        int tgt1Position = laddermidpos;
-//        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
-        LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt1Position);
-        LadderLift.setPower(1);
-        LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (LadderLift.isBusy()) {
-            telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    public void ladder_run_to_position3() {
-        int tgt3Position = ladderhighpos;
-        LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt3Position);
+        LadderLift.setTargetPosition(tgtposition);
         LadderLift.setPower(1);
         LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LadderLift.isBusy()) {
@@ -351,11 +328,11 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
             /* LadderLift positions */ /* Drone Positions */
             if (gamepad2.a) {
-                ladder_run_to_position0();
+                ladder_run_to_position(ladderlowpos);
             } if (gamepad2.x) {
-                ladder_run_to_position1();
+                ladder_run_to_position(laddermidpos);
             } if (gamepad2.y) {
-                ladder_run_to_position3();
+                ladder_run_to_position(ladderhighpos);
             }
 
             telemetry.update();
