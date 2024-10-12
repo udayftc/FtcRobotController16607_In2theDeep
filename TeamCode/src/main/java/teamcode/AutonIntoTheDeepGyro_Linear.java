@@ -4,7 +4,6 @@ package teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -32,22 +31,14 @@ import java.util.List;
  *
  *  The path to be followed by the robot is built from a series of drive, turn or pause steps.
  *  Each step on the path is defined by a single function call, and these can be strung together in any order.
- *
  *  The code REQUIRES that you have encoders on the drive motors, otherwise you should use: RobotAutoDriveByTime;
- *
- *  This code uses the Universal IMU interface so it will work with either the BNO055, or BHI260 IMU.
- *  To run as written, the Control/Expansion hub should be mounted horizontally on a flat part of the robot chassis.
- *  The REV Logo should be facing UP, and the USB port should be facing forward.
- *  If this is not the configuration of your REV Control Hub, then the code should be modified to reflect the correct orientation.
- *
+
  *  This sample requires that the drive Motors have been configured with names : left_drive and right_drive.
  *  It also requires that a positive power command moves both motors forward, and causes the encoders to count UP.
  *  So please verify that both of your motors move the robot forward on the first move.  If not, make the required correction.
  *  See the beginning of runOpMode() to set the FORWARD/REVERSE option for each motor.
  *
  *  This code uses RUN_TO_POSITION mode for driving straight, and RUN_USING_ENCODER mode for turning and holding.
- *  Note: This code implements the requirement of calling setTargetPosition() at least once before switching to RUN_TO_POSITION mode.
- *
  *  Notes:
  *
  *  All angles are referenced to the coordinate-frame that is set whenever resetHeading() is called.
@@ -60,18 +51,11 @@ import java.util.List;
  *  https://ftc-docs.firstinspires.org/field-coordinate-system
  *
  *  Control Approach.
- *
  *  To reach, or maintain a required heading, this code implements a basic Proportional Controller where:
- *
  *      Steering power = Heading Error * Proportional Gain.
- *
  *      "Heading Error" is calculated by taking the difference between the desired heading and the actual heading,
  *      and then "normalizing" it by converting it to a value in the +/- 180 degree range.
- *
  *      "Proportional Gain" is a constant that YOU choose to set the "strength" of the steering response.
- *
- *  Use Android Studio to Copy this Class, and Paste it into your "TeamCode" folder with a new name.
- *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
 @Autonomous(name="Robot: Auto Drive By Gyro")
@@ -86,7 +70,6 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
     private DcMotor Backleft;
     private DcMotor Backright;
     private Servo Intake;
-    private Servo Drone;
     private Servo Servoarm;
     private DcMotor arm;
 
@@ -107,11 +90,11 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
     private double  rightSpeed    = 0;
     private int     leftTarget    = 0;
     private int     rightTarget   = 0;
-    private int armhighpos = 500;
-    private int armlowpos = 100;
-    private int ladderhighpos = 2650;
-    private int laddermidpos = 500;
+    private int armhighpos = 450;
+    private int armlowpos = 30;
+    private int ladderhighpos = 1900;
     private int ladderlowpos = 0;
+    private int laddermidpos = 850;
     private int flencoderpos = 0;
     private int frencoderpos = 0;
     private int blencoderpos = 0;
@@ -147,15 +130,30 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
         Intake = hardwareMap.get(Servo.class, "Intake");
         Servoarm = hardwareMap.get(Servo.class, "Servoarm");
         arm = hardwareMap.get(DcMotor.class, "arm");
-        arm.setDirection(DcMotor.Direction.REVERSE);
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.setPower(0.0);
-        Drone = hardwareMap.get(Servo.class, "Drone");
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
+        Backleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionBL", Backleft.getDirection());
+        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeBL:", Backleft.getCurrentPosition());
+        Backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Backright = hardwareMap.get(DcMotor.class, "Backright");
+        Backright.setDirection(DcMotorSimple.Direction.FORWARD);
+        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeBL:", Backright.getCurrentPosition());
+        telemetry.addData("DcMotor DirectionBR", Backright.getDirection());
+        Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Frontleft = hardwareMap.get(DcMotor.class, "Frontleft");
+        Frontleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionFL", Frontleft.getDirection());
+        Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeFL:", Frontleft.getCurrentPosition());
+        Frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Frontright = hardwareMap.get(DcMotor.class, "Frontright");
+        Frontright.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionFR", Frontright.getDirection());
+        Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeFR:", Frontright.getCurrentPosition());
+        Frontright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Hook = hardwareMap.get(DcMotor.class, "Hook");
         Hook.setDirection(DcMotorSimple.Direction.REVERSE);
         Hook.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -164,26 +162,10 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
         LadderLift.setDirection(DcMotorSimple.Direction.REVERSE);
         LadderLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Frontleft.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionFL", Frontleft.getDirection());
-        Frontright.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionFR", Frontright.getDirection());
-        Backright.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionBR", Backright.getDirection());
-        Backleft.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionBL", Backleft.getDirection());
-        Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeFL:", Frontleft.getCurrentPosition());
-        Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeFR:", Frontright.getCurrentPosition());
-        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeBL:", Backleft.getCurrentPosition());
-        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeBR:", Backleft.getCurrentPosition());
-        Frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Frontright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setDirection(DcMotor.Direction.FORWARD);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setPower(0.0);
         telemetry.update();
     }
     public void init_navx() throws InterruptedException {
@@ -203,11 +185,9 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
         telemetry.clear();
         telemetry.update();
     }
-    public void ladder_run_to_position0() {
-        int tgt0Position = ladderlowpos;
-        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
+    public void ladder_run_to_position(int tgtposition) {
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt0Position);
+        LadderLift.setTargetPosition(tgtposition);
         LadderLift.setPower(1);
         LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         while (LadderLift.isBusy()) {
@@ -215,25 +195,12 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
             telemetry.update();
         }
     }
-    public void ladder_run_to_position1() {
-        int tgt1Position = laddermidpos;
-        LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt1Position);
-        LadderLift.setPower(1);
-        LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (LadderLift.isBusy()) {
-            telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    public void ladder_run_to_position3() {
-        int tgt3Position = ladderhighpos;
-        LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        LadderLift.setTargetPosition(tgt3Position);
-        LadderLift.setPower(1);
-        LadderLift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        while (LadderLift.isBusy()) {
-            telemetry.addData("LadderPos:", LadderLift.getCurrentPosition());
+    public void arm_run_to_position(int armtgtpos) {
+        arm.setTargetPosition(armtgtpos);
+        arm.setPower(1.0);
+        arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        while (arm.isBusy()) {
+            telemetry.addData("arm Pos:", arm.getCurrentPosition());
             telemetry.update();
         }
     }
@@ -298,9 +265,6 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
 
     /**
     *  Drive in a straight line, on a fixed compass heading (angle), based on encoder counts.
-    *  Move will stop if either of these conditions occur:
-    *  1) Move gets to the desired position
-    *  2) Driver stops the OpMode running.
     *
     * @param maxDriveSpeed MAX Speed for forward/rev motion (range 0 to +1.0) .
     * @param distance   Distance (in inches) to move from current position.  Negative distance means move backward.
@@ -359,12 +323,6 @@ public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {
 
     /**
      *  Spin on the central axis to point in a new direction.
-     *  <p>
-     *  Move will stop if either of these conditions occur:
-     *  <p>
-     *  1) Move gets to the heading (angle)
-     *  <p>
-     *  2) Driver stops the OpMode running.
      *
      * @param maxTurnSpeed Desired MAX speed of turn. (range 0 to +1.0)
      * @param heading Absolute Heading Angle (in Degrees) relative to last gyro reset.
