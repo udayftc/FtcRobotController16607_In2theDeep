@@ -17,7 +17,7 @@ import teamcode.subsystems.BlinkinLEDs;
 import teamcode.vision.Vision;
 
 /**
- * This class implements auto-assist pickup pixel task.
+ * This class implements auto-assist pickup sample task.
  */
 public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State>
 {
@@ -46,13 +46,12 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
     private final TrcEvent event;
 
     private String currOwner = null;
-    private Vision.SampleType pixelType = null;
+    private Vision.SampleType sampleType = null;
     private TrcPose2D samplePose = null;
     private Double visionExpiredTime = null;
 
     /**
      * Constructor: Create an instance of the object.
-     *
      * @param ownerName specifies the owner name to take subsystem ownership, can be null if no ownership required.
      * @param robot specifies the robot object that contains all the necessary subsystems.
      */
@@ -62,19 +61,18 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
         this.ownerName = ownerName;
         this.robot = robot;
         event = new TrcEvent(moduleName);
-    }   //TaskAutoPickupPixel
+    }   //TaskAutoPickupSample
 
     /**
      * This method starts the auto-assist pickup operation.
-     *
-     * @param pixelType specifies the pixel type to look for and pick up.
+     * @param sampleType specifies the sample type to look for and pick up.
      * @param completionEvent specifies the event to signal when done, can be null if none provided.
      */
-    public void autoAssistPickup(Vision.SampleType pixelType, TrcEvent completionEvent)
+    public void autoAssistPickup(Vision.SampleType sampleType, TrcEvent completionEvent)
     {
-        tracer.traceInfo(moduleName, "pixelType=%s, event=%s", pixelType, completionEvent);
-        this.pixelType = pixelType;
-        startAutoTask(State.START, new TaskParams(pixelType), completionEvent);
+        tracer.traceInfo(moduleName, "sampleType=%s, event=%s", sampleType, completionEvent);
+        this.sampleType = sampleType;
+        startAutoTask(State.START, new TaskParams(sampleType), completionEvent);
     }   //autoAssistPickup
 
     /**
@@ -93,7 +91,6 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
     /**
      * This method is called by the super class to acquire ownership of all subsystems involved in the auto-assist
      * operation. This is typically done before starting an auto-assist operation.
-     *
      * @return true if acquired all subsystems ownership, false otherwise. It releases all ownership if any acquire
      *         failed.
      */
@@ -148,10 +145,10 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
         robot.robotDrive.cancel(currOwner);
         robot.intake.stop();
 
-        if (robot.vision != null && pixelType != null)
+        if (robot.vision != null && sampleType != null)
         {
-            robot.vision.setPixelVisionEnabled(pixelType, false);
-            pixelType = null;
+            robot.vision.setSampleVisionEnabled(sampleType, false);
+            sampleType = null;
         }
     }   //stopSubsystems
 
@@ -178,9 +175,9 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
                 samplePose = null;
                 if (robot.vision != null)
                 {
-                    // Set up vision: turn on front camera and enable pixel detection pipeline.
+                    // Set up vision: turn on front camera and enable sample detection pipeline.
                     robot.vision.setActiveWebcam(robot.vision.getFrontWebcam());
-                    robot.vision.setPixelVisionEnabled(taskParams.sampleType, true);
+                    robot.vision.setSampleVisionEnabled(taskParams.sampleType, true);
                     if (robot.elevatorArm != null)
                     {
                         // Make sure the ElevatorArm is at loading position.

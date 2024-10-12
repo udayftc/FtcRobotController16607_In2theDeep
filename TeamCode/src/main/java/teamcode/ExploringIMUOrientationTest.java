@@ -44,7 +44,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name="Concept: IMU Orientation", group="Concept")
 @Disabled
-public class ExploringIMUOrientationOpmode extends LinearOpMode {
+public class ExploringIMUOrientationTest extends LinearOpMode {
     static RevHubOrientationOnRobot.LogoFacingDirection[] logoFacingDirections
             = RevHubOrientationOnRobot.LogoFacingDirection.values();
     static RevHubOrientationOnRobot.UsbFacingDirection[] usbFacingDirections

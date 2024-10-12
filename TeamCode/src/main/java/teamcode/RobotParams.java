@@ -1,5 +1,4 @@
 
-
 package teamcode;
 
 import android.os.Environment;
@@ -51,14 +50,13 @@ public class RobotParams
         public static boolean useAprilTagVision = true;
         public static boolean useColorBlobVision = true;
         public static boolean useTensorFlowVision = false;
-        public static boolean useTfodModelAsset = false;
         public static boolean showVisionView = !inCompetition;
         // Drive Base
-        public static boolean useExternalOdometry = robotType == RobotType.CenterStageRobot || robotType == RobotType.IntotheDeepRobot;
+        public static boolean useExternalOdometry = robotType == RobotType.IntotheDeepRobot;
         public static boolean doSwervePhysicalAlignment = false;
         public static boolean swerveDualServoSteering = true;
         // Subsystems
-        public static boolean useSubsystems = robotType == RobotType.CenterStageRobot || robotType == RobotType.IntotheDeepRobot;
+        public static boolean useSubsystems = robotType == RobotType.IntotheDeepRobot;
         public static boolean useElevatorArm = true;
         public static boolean useElevator = true;
         public static boolean useArm = true;
@@ -67,16 +65,15 @@ public class RobotParams
         public static boolean useIntake = true;
 
         public static boolean useSampleTray = false;
-        public static boolean useLauncher = false;
     }   //class Preferences
 
     public static final String ROBOT_NAME                       = "IntotheDeep_2025";
     public static RevHubOrientationOnRobot.LogoFacingDirection hubLogoDirection =
-        Preferences.robotType == RobotType.CenterStageRobot ? RevHubOrientationOnRobot.LogoFacingDirection.LEFT :
+        Preferences.robotType == RobotType.IntotheDeepRobot ? RevHubOrientationOnRobot.LogoFacingDirection.LEFT :
         Preferences.robotType == RobotType.PowerPlayRobot ? RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD :
             RevHubOrientationOnRobot.LogoFacingDirection.UP;
     public static RevHubOrientationOnRobot.UsbFacingDirection hubUsbDirection =
-        Preferences.robotType == RobotType.CenterStageRobot || Preferences.robotType == RobotType.PowerPlayRobot ?
+        Preferences.robotType == RobotType.IntotheDeepRobot ?
             RevHubOrientationOnRobot.UsbFacingDirection.UP : RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
     public static final String TEAM_FOLDER_PATH                 =
         Environment.getExternalStorageDirectory().getPath() + "/FIRST/ftc16607";
@@ -91,10 +88,10 @@ public class RobotParams
     public static final String HWNAME_WEBCAM2                   = "Webcam 2";
     public static final String HWNAME_BLINKIN                   = "blinkin";
     // Drive Base.
-    public static final String HWNAME_LFDRIVE_MOTOR             = "lfDriveMotor";
-    public static final String HWNAME_RFDRIVE_MOTOR             = "rfDriveMotor";
-    public static final String HWNAME_LBDRIVE_MOTOR             = "lbDriveMotor";
-    public static final String HWNAME_RBDRIVE_MOTOR             = "rbDriveMotor";
+    public static final String HWNAME_LFDRIVE_MOTOR             = "Frontleft";
+    public static final String HWNAME_RFDRIVE_MOTOR             = "Frontright";
+    public static final String HWNAME_LBDRIVE_MOTOR             = "Backleft";
+    public static final String HWNAME_RBDRIVE_MOTOR             = "Backright";
     public static final String HWNAME_LFSTEER_SERVO             = "lfSteerServo";
     public static final String HWNAME_RFSTEER_SERVO             = "rfSteerServo";
     public static final String HWNAME_LBSTEER_SERVO             = "lbSteerServo";
@@ -104,12 +101,11 @@ public class RobotParams
     public static final String HWNAME_LBSTEER_ENCODER           = "lbSteerEncoder";
     public static final String HWNAME_RBSTEER_ENCODER           = "rbSteerEncoder";
     // Subsystems.
-    public static final String HWNAME_ELEVATOR                  = "elevator";
-    public static final String HWNAME_ARM                       = "arm";
+    public static final String HWNAME_ELEVATOR                  = "LadderLift";
+    public static final String HWNAME_ARM                       = "Servoarm";
     public static final String HWNAME_WRIST                     = "wrist";
-    public static final String HWNAME_INTAKE                    = "intake";
+    public static final String HWNAME_INTAKE                    = "Intake";
     public static final String HWNAME_SAMPLETRAY                 = "sampleTray";
-    public static final String HWNAME_LAUNCHER                  = "launcher";
     //
     // Field dimensions.
     //

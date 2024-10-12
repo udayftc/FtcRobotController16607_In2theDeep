@@ -33,7 +33,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     private DcMotor Frontleft;
     private DcMotor Backleft;
     private DcMotor Backright;
-
     private Servo Intake;
     private Servo Drone;
     private Servo Servoarm;
@@ -42,21 +41,32 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     private Limelight3A limelight;
     IntegratingGyroscope gyro;
     NavxMicroNavigationSensor navxMicro;
-    private int armhighpos = 450;
-    private int armlowpos = 100;
-    private int ladderhighpos = 1900;
+
+    private int armhighpos = 100;
+    private int armlowpos = 30;
+    private int ladderhighpos = 2000;
     private int ladderlowpos = 0;
-    //arm test
-    private int laddermidpos = 850;
+	private int laddermidpos = 300;
+    private int tgthPosition = 8400;
+    private int tgthlPosition = 40;
+
+    private int flencoderpos = 0;
+    private int frencoderpos = 0;
+    private int blencoderpos = 0;
+    private int brencoderpos = 0;
 
     ElapsedTime timer = new ElapsedTime();
 
+    public void init_LL() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
+        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
+        limelight.start();
+    }
     public void run_LL() {
         LLStatus status = limelight.getStatus();
-        //telemetry.addData("Name", "%s",
-        //        status.getName());
-//        telemetry.addData("LL", "Temp: %.1fC, CPU: %.1f%%, FPS: %d",
-//                status.getTemp(), status.getCpu(),(int)status.getFps());
+        //telemetry.addData("Name", "%s",status.getName());
         //telemetry.addData("Pipeline", "Index: %d, Type: %s",
         //        status.getPipelineIndex(), status.getPipelineType());
 
@@ -67,9 +77,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             double captureLatency = result.getCaptureLatency();
             double targetingLatency = result.getTargetingLatency();
             double parseLatency = result.getParseLatency();
-//            telemetry.addData("LL Latency", captureLatency + targetingLatency);
-//            telemetry.addData("Parse Latency", parseLatency);
-//            telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
 
             if (result.isValid()) {
             //    telemetry.addData("tx", result.getTx());
@@ -113,45 +120,62 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
             //telemetry.addData("Limelight", "No data available");
         }
     }
-    public void init_LL() {
-        limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        telemetry.setMsTransmissionInterval(11);
-        limelight.pipelineSwitch(0);
-        /*Starts polling for data.  If you neglect to call start(), getLatestResult() will return null.*/
-        limelight.start();
+
+    public void init_navx() throws InterruptedException {
+        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
+        gyro = (IntegratingGyroscope) navxMicro;
+        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        // Wait until the gyro calibration is complete
+        timer.reset();
+        while (navxMicro.isCalibrating()) {
+            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
+            telemetry.update();
+            //noinspection BusyWait
+            Thread.sleep(50);
+        }
+        telemetry.log().clear();
+        telemetry.log().add("Gyro Calibrated.");
+        telemetry.clear();
+        telemetry.update();
     }
     public float run_navx() {
-        // Read dimensionalized data from the gyro. This gyro can report angular velocities
-        // about all three axes. Additionally, it internally integrates the Z axis to
-        // be able to report an absolute angular Z orientation.
+
         AngularVelocity rates = gyro.getAngularVelocity(AngleUnit.DEGREES);
         Orientation angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-/**
-        telemetry.addLine()
-                .addData("dx", formatRate(rates.xRotationRate))
-                .addData("dy", formatRate(rates.yRotationRate))
-                .addData("dz", "%s deg/s", formatRate(rates.zRotationRate));
-*/
-       /* telemetry.addLine()
-                .addData("heading", formatAngle(angles.angleUnit, angles.firstAngle));
-//                .addData("roll", formatAngle(angles.angleUnit, angles.secondAngle))
-//                .addData("pitch", "%s deg", formatAngle(angles.angleUnit, angles.thirdAngle));
+       /* telemetry.addData("heading", formatAngle(angles.angleUnit, angles.firstAngle));
         telemetry.update();*/
         return angles.firstAngle;
     }
+
     public void init_motors() {
-        Intake = hardwareMap.get(Servo.class, "Test");
+        Intake = hardwareMap.get(Servo.class, "Intake");
         Servoarm = hardwareMap.get(Servo.class, "Servoarm");
-        arm = hardwareMap.get(DcMotor.class, "arm");
-        arm.setDirection(DcMotor.Direction.REVERSE);
-        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        arm.setPower(0.0);
         Drone = hardwareMap.get(Servo.class, "Drone");
+        arm = hardwareMap.get(DcMotor.class, "arm");
         Backleft = hardwareMap.get(DcMotor.class, "Backleft");
+        Backleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionBL", Backleft.getDirection());
+        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeBL:", Backleft.getCurrentPosition());
+        Backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Backright = hardwareMap.get(DcMotor.class, "Backright");
+        Backright.setDirection(DcMotorSimple.Direction.FORWARD);
+        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeBL:", Backright.getCurrentPosition());
+        telemetry.addData("DcMotor DirectionBR", Backright.getDirection());
+        Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Frontleft = hardwareMap.get(DcMotor.class, "Frontleft");
+        Frontleft.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionFL", Frontleft.getDirection());
+        Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeFL:", Frontleft.getCurrentPosition());
+        Frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Frontright = hardwareMap.get(DcMotor.class, "Frontright");
+        Frontright.setDirection(DcMotorSimple.Direction.FORWARD);
+        telemetry.addData("DcMotor DirectionFR", Frontright.getDirection());
+        Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        telemetry.addData("DcMotor ModeFR:", Frontright.getCurrentPosition());
+        Frontright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Hook = hardwareMap.get(DcMotor.class, "Hook");
         Hook.setDirection(DcMotorSimple.Direction.REVERSE);
         Hook.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -160,28 +184,13 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         LadderLift.setDirection(DcMotorSimple.Direction.REVERSE);
         LadderLift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Frontleft.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionFL", Frontleft.getDirection());
-        Frontright.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionFR", Frontright.getDirection());
-        Backright.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionBR", Backright.getDirection());
-        Backleft.setDirection(DcMotorSimple.Direction.FORWARD);
-        telemetry.addData("DcMotor DirectionBL", Backleft.getDirection());
-        Frontleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeFL:", Frontleft.getCurrentPosition());
-        Frontright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeFR:", Frontright.getCurrentPosition());
-        Backleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeBL:", Backleft.getCurrentPosition());
-        Backright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        telemetry.addData("DcMotor ModeBR:", Backleft.getCurrentPosition());
-        Frontleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Frontright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Backleft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Backright.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm.setDirection(DcMotor.Direction.REVERSE);
+        arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        arm.setPower(0.0);
         telemetry.update();
     }
+
     public void Mecanumdriveyaw(double yawDegrees) {
         Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
         Backright.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -211,6 +220,23 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         Backleft.setPower(powerBL);
         Backright.setPower(powerBR);
     }
+    public void Mecanumdrive() {
+        Frontright.setDirection(DcMotorSimple.Direction.REVERSE);
+        Backright.setDirection(DcMotorSimple.Direction.REVERSE);
+        double h = Math.hypot(gamepad1.right_stick_x, gamepad1.right_stick_y);
+        double robotAngle = Math.atan2(gamepad1.right_stick_y, gamepad1.right_stick_x) - Math.PI / 4;
+        double rightX = gamepad1.left_stick_x;
+        final double v1 = h * Math.sin(robotAngle) - rightX;
+        final double v2 = h * Math.cos(robotAngle) + rightX;
+        final double v3 = h * Math.cos(robotAngle) - rightX;
+        final double v4 = h * Math.sin(robotAngle) + rightX;
+
+        Frontleft.setPower(v1);
+        Frontright.setPower(v2);
+        Backleft.setPower(v3);
+        Backright.setPower(v4);
+    }
+
     public void Hook_Zero_Pwr_Behavior() {
         Hook.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
@@ -228,7 +254,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
     }
     public void ladder_run_to_position1() {
         int tgt1Position = laddermidpos;
-//        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
+        LadderLift.setDirection(DcMotorSimple.Direction.FORWARD);
         LadderLift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         LadderLift.setTargetPosition(tgt1Position);
         LadderLift.setPower(1);
@@ -250,7 +276,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         }
     }
     public void hook_run_to_high_position() {
-        int tgthPosition = 8400;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Hook.setTargetPosition(tgthPosition);
         Hook.setPower(0.6);
@@ -261,7 +286,6 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         }
     }
     public void hook_run_to_zero_position() {
-        int tgthlPosition = 40;
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         Hook.setTargetPosition(tgthlPosition);
         Hook.setPower(0.6);
@@ -272,23 +296,7 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         }
         Hook_Zero_Pwr_Behavior();
     }
-    public void init_navx() throws InterruptedException {
-        navxMicro = hardwareMap.get(NavxMicroNavigationSensor.class, "navx");
-        gyro = (IntegratingGyroscope) navxMicro;
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
-        // Wait until the gyro calibration is complete
-        timer.reset();
-        while (navxMicro.isCalibrating()) {
-            telemetry.addData("calibrating", "%s", Math.round(timer.seconds()) % 2 == 0 ? "|.." : "..|");
-            telemetry.update();
-            //noinspection BusyWait
-            Thread.sleep(50);
-        }
-        telemetry.log().clear();
-        telemetry.log().add("Gyro Calibrated.");
-        telemetry.clear();
-        telemetry.update();
-    }
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -309,27 +317,20 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
 
             float yawDegrees = run_navx();
             run_LL();
-            //telemetry.addData("yawreturned", yawDegrees);
-            //telemetry.update();
+            telemetry.addData("yawreturned", yawDegrees);
+            telemetry.update();
             Mecanumdriveyaw (yawDegrees);
             /* servo open and close and positions */ /* Hook Positions */
             if (gamepad1.dpad_left) {
                 Intake.setPosition(0);
-            } if (gamepad1.dpad_right) {
+            } else if (gamepad1.dpad_right) {
                 Intake.setPosition(1);
-            } if (gamepad1.left_bumper) {
+            } else if (gamepad1.left_bumper) {
                 Servoarm.setPosition(0);
-            } if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper) {
                 Servoarm.setPosition(1);
-            } if (gamepad1.dpad_down) {
-                arm.setTargetPosition(armlowpos);
-                arm.setPower(0.2);
-                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                while (arm.isBusy()) {
-                    telemetry.addData("arm Pos:", arm.getCurrentPosition());
-                    telemetry.update();
-                }
-            }  if (gamepad1.dpad_up) {
+            } else if (gamepad1.dpad_up) {
+                //hook_run_to_high_position();
                 arm.setDirection(DcMotorSimple.Direction.FORWARD);
                 arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 arm.setTargetPosition(armhighpos);
@@ -339,22 +340,31 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
                     telemetry.addData("arm Pos:", arm.getCurrentPosition());
                     telemetry.update();
                 }
+            } else if (gamepad1.dpad_down) {
+                //hook_run_to_zero_position();
+               // arm.setDirection(DcMotorSimple.Direction.REVERSE);
+                //arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                arm.setTargetPosition(armlowpos);
+                arm.setPower(1.0);
+                arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                while (arm.isBusy()) {
+                    telemetry.addData("arm Pos:", arm.getCurrentPosition());
+                    telemetry.update();
+                }
             }
 
-            /** LadderLift and Hook positions */
+            /* LadderLift positions */ /* Drone Positions */
             if (gamepad2.a) {
                 ladder_run_to_position0();
-            } if (gamepad2.x) {
+            } else if (gamepad2.x) {
                 ladder_run_to_position1();
-            } if (gamepad2.y) {
+            } else if (gamepad2.y) {
                 ladder_run_to_position3();
-                } if (gamepad2.dpad_up) {
-                hook_run_to_high_position();
-            } if (gamepad2.dpad_down) {
-                hook_run_to_zero_position();
+            } else if (gamepad2.left_bumper) {
+                Drone.setPosition(0);
+            } else if (gamepad2.right_bumper) {
+                Drone.setPosition(1);
             }
-
-
             telemetry.update();
             idle();
         }
@@ -373,19 +383,5 @@ public class IntoTheDeepTeleOM extends LinearOpMode {
         return String.format("%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 }
-          /*  if (rampUp) {
-                // Keep stepping up until we hit the max value.
-                power += INCREMENT;
-                if (power >= MAX_FWD) {
-                    power = MAX_FWD;
-                    rampUp = !rampUp;   // Switch ramp direction
-                }
-            } else {
-                // Keep stepping down until we hit the min value.
-                power -= INCREMENT;
-                if (power <= MAX_REV) {
-                    power = MAX_REV;
-                    rampUp = !rampUp;  // Switch ramp direction
-                }
-            }*/
+
 

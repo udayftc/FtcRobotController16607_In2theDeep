@@ -1,6 +1,3 @@
-/*
- * Copyright (c) 2023 Titan Robotics Club (http://www.titanrobotics.com)
- */
 
 package teamcode;
 
@@ -259,28 +256,10 @@ public class FtcTest extends FtcTeleOp
                         robot.vision.setAprilTagVisionEnabled(true);
                     }
 
-                    if (robot.vision.purplePixelVision != null)
-                    {
-                        robot.globalTracer.traceInfo(moduleName, "Enabling PurplePixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.SampleType.PurplePixel, true);
-                    }
-
-                    if (robot.vision.greenPixelVision != null)
-                    {
-                        robot.globalTracer.traceInfo(moduleName, "Enabling GreenPixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.SampleType.GreenPixel, true);
-                    }
-
-                    if (robot.vision.yellowPixelVision != null)
+                    if (robot.vision.yellowSampleVision != null)
                     {
                         robot.globalTracer.traceInfo(moduleName, "Enabling YellowPixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.SampleType.YellowPixel, true);
-                    }
-
-                    if (robot.vision.whitePixelVision != null)
-                    {
-                        robot.globalTracer.traceInfo(moduleName, "Enabling WhitePixelVision.");
-                        robot.vision.setPixelVisionEnabled(Vision.SampleType.WhitePixel, true);
+                        robot.vision.setSampleVisionEnabled(Vision.SampleType.YellowSample, true);
                     }
 
                     if (robot.vision.redBlobVision != null)
@@ -621,11 +600,6 @@ public class FtcTest extends FtcTeleOp
                     }
                     passToTeleOp = false;
                 }
-                else if (testChoices.test == Test.TUNE_LAUNCHER_POWER && robot.launcher != null)
-                {
-                    robot.launcher.setPower(pressed ? launchPower : 0.0);
-                    passToTeleOp = false;
-                }
                 break;
 
             case FtcGamepad.GAMEPAD_X:
@@ -707,15 +681,6 @@ public class FtcTest extends FtcTeleOp
                     }
                     passToTeleOp = false;
                 }
-                else if (testChoices.test == Test.TUNE_LAUNCHER_POWER && robot.launcher != null)
-                {
-                    if (pressed)
-                    {
-                        launchPower += LAUNCHER_POWER_STEP;
-                        if (launchPower > 1.0) launchPower = 1.0;
-                    }
-                    passToTeleOp = false;
-                }
                 break;
 
             case FtcGamepad.GAMEPAD_DPAD_DOWN:
@@ -740,15 +705,6 @@ public class FtcTest extends FtcTeleOp
                         // Decrement color threshold value.
                         colorThresholds[colorThresholdIndex] -= colorThresholdMultiplier;
                         updateColorThresholds();
-                    }
-                    passToTeleOp = false;
-                }
-                else if (testChoices.test == Test.TUNE_LAUNCHER_POWER && robot.launcher != null)
-                {
-                    if (pressed)
-                    {
-                        launchPower -= LAUNCHER_POWER_STEP;
-                        if (launchPower < 0.0) launchPower = 0.0;
                     }
                     passToTeleOp = false;
                 }
