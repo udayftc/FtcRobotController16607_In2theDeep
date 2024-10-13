@@ -57,7 +57,6 @@ import java.util.List;
  *      "Proportional Gain" is a constant that YOU choose to set the "strength" of the steering response.
  */
 
-//Into the deep main auton node 16607
 @Autonomous(name="Robot: Auto Drive By Gyro")
 
 public class AutonIntoTheDeepGyro_Linear extends LinearOpMode {

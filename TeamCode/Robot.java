@@ -11,12 +11,12 @@ import TrcCommonLib.trclib.TrcServo;
 import TrcCommonLib.trclib.TrcTimer;
 import TrcCommonLib.ftclib.FtcDashboard;
 import TrcCommonLib.ftclib.FtcOpMode;
-import TrcCommonLib.subsystems.TaskAutoPlaceSample;
-import TrcCommonLib.subsystems.RobotDrive;
-import TrcCommonLib.subsystems.ElevatorArm;
-import TrcCommonLib.subsystems.Intake;
-import TrcCommonLib.subsystems.SampleTray;
-import TrcCommonLib.subsystems.Vision;
+import teamcode.subsystems.TaskAutoPlaceSample;
+import teamcode.subsystems.RobotDrive;
+import teamcode.subsystems.ElevatorArm;
+import teamcode.subsystems.Intake;
+import teamcode.subsystems.SampleTray;
+import teamcode.subsystems.Vision;
 
 /**
  * This class creates the robot object that consists of sensors, indicators, drive base and all the subsystems.
