@@ -6,7 +6,6 @@ import TrcCommonLib.trclib.TrcPidDrive;
 import TrcCommonLib.trclib.TrcPurePursuitDrive;
 import TrcCommonLib.trclib.TrcUtil;
 import ftclib.FtcDcMotor;
-import ftclib.FtcImu;
 import teamcode.RobotParams;
 
 /**
@@ -27,9 +26,6 @@ public class RobotDrive
     //
     // Sensors.
     //
-    public final FtcImu gyro;
-
-    //
     // Subclass needs to initialize the following variables.
     //
     // Drive motors.
@@ -43,10 +39,7 @@ public class RobotDrive
     /**
      * Constructor: Create an instance of the object.
      */
-    public RobotDrive()
-    {
-        gyro = new FtcImu(RobotParams.HWNAME_IMU, RobotParams.hubLogoDirection, RobotParams.hubUsbDirection);
-    }   //RobotDrive
+  //RobotDrive
 
     /**
      * This method cancels any PIDDrive operation still in progress.

@@ -48,11 +48,9 @@ import ftclib.FtcRawEocvVision;
 import ftclib.FtcVision;
 import ftclib.FtcVisionAprilTag;
 import ftclib.FtcVisionEocvColorBlob;
-import ftclib.FtcVisionTensorFlow;
 import teamcode.FtcAuto;
 import teamcode.Robot;
 import teamcode.RobotParams;
-import teamcode.subsystems.BlinkinLEDs;
 
 /**
  * This class implements AprilTag/TensorFlow/Eocv Vision for the game season. It creates and initializes all the
@@ -115,7 +113,6 @@ public class Vision
     private FtcEocvColorBlobProcessor redBlobProcessor;
     public FtcVisionEocvColorBlob blueBlobVision;
     private FtcEocvColorBlobProcessor blueBlobProcessor;
-    public FtcVisionTensorFlow tensorFlowVision;
     public FtcVision vision;
     private int lastTeamPropPos = 0;
 
@@ -355,11 +352,6 @@ public class Vision
         TrcVisionTargetInfo<FtcVisionAprilTag.DetectedObject> aprilTagInfo =
             aprilTagVision.getBestDetectedTargetInfo(id, null);
 
-        if (aprilTagInfo != null && robot.blinkin != null)
-        {
-            robot.blinkin.setDetectedPattern(BlinkinLEDs.APRIL_TAG);
-        }
-
         if (lineNum != -1)
         {
             robot.dashboard.displayPrintf(lineNum, "AprilTag: %s", aprilTagInfo != null? aprilTagInfo: "Not found.");
@@ -499,7 +491,6 @@ public class Vision
             case YellowSample:
                 pixelInfo = yellowSampleVision != null? yellowSampleVision.getBestDetectedTargetInfo(
                     this::validatePixel, this::compareDistance, 0.0, 0.0): null;
-                pixelName = BlinkinLEDs.YELLOW_SAMPLE;
                 break;
 
             case AnySample:
@@ -522,11 +513,6 @@ public class Vision
                 pixelInfo = pixels[0];
                 pixelName = pixelInfo.detectedObj.label;
                 break;
-        }
-
-        if (pixelInfo != null && robot.blinkin != null)
-        {
-            robot.blinkin.setDetectedPattern(pixelName);
         }
 
         if (lineNum != -1)
@@ -611,25 +597,14 @@ public class Vision
             if (teamPropXPos < oneThirdScreenWidth)
             {
                 pos = 1;
-                ledLabel = alliance == FtcAuto.Alliance.RED_ALLIANCE?
-                    BlinkinLEDs.RED_BLOB_POS_1: BlinkinLEDs.BLUE_BLOB_POS_1;
             }
             else if (teamPropXPos < oneThirdScreenWidth*2)
             {
                 pos = 2;
-                ledLabel = alliance == FtcAuto.Alliance.RED_ALLIANCE?
-                    BlinkinLEDs.RED_BLOB_POS_2: BlinkinLEDs.BLUE_BLOB_POS_2;
             }
             else
             {
                 pos = 3;
-                ledLabel = alliance == FtcAuto.Alliance.RED_ALLIANCE?
-                    BlinkinLEDs.RED_BLOB_POS_3: BlinkinLEDs.BLUE_BLOB_POS_3;
-            }
-
-            if (robot.blinkin != null)
-            {
-                robot.blinkin.setDetectedPattern(ledLabel);
             }
         }
 
@@ -702,11 +677,4 @@ public class Vision
      * @return negative value if a has higher confidence than b, 0 if a and b have equal confidence, positive value
      *         if a has lower confidence than b.
      */
-    private int compareConfidence(
-        TrcVisionTargetInfo<FtcVisionTensorFlow.DetectedObject> a,
-        TrcVisionTargetInfo<FtcVisionTensorFlow.DetectedObject> b)
-    {
-        return (int)((b.detectedObj.confidence - a.detectedObj.confidence)*100);
-    }   //compareConfidence
-
 }   //class Vision

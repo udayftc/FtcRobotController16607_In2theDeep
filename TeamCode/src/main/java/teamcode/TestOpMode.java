@@ -14,29 +14,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp
 public class TestOpMode extends LinearOpMode {
 
-    //private Gyroscope imu;
-    //private DigitalChannel digitalTouch;
-    //private DistanceSensor sensorColorRange;
-
     private DcMotor LadderLift;
     private DcMotor Hook;
     private DcMotor Frontright;
     private DcMotor Frontleft;
     private DcMotor Backleft;
     private DcMotor Backright;
-    private IMU imu;
 
     private Servo Test;
     private Servo Drone;
     private Servo Servoarm;
-    //static final double INCREMENT = 0.01;
-    //static final int CYCLE_MS = 50;
-    //static final double MAX_FWD = 1.0;
-    //static final double MAX_REV = -1.0;
-
-    RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
-    RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.UP;
-    RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
     int cp = 0;
     //double power = 0;
@@ -52,7 +39,6 @@ public class TestOpMode extends LinearOpMode {
         Frontleft = hardwareMap.get(DcMotor.class, "Frontleft");
         Frontright = hardwareMap.get(DcMotor.class, "Frontright");
         Hook = hardwareMap.get(DcMotor.class, "Hook");
-        imu = hardwareMap.get(IMU.class, "imu");
         Hook.setDirection(DcMotorSimple.Direction.REVERSE);
         Hook.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Hook.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -265,34 +251,10 @@ public class TestOpMode extends LinearOpMode {
          */
 
         init_motors();
-        imu.initialize(new IMU.Parameters(orientationOnRobot));
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-        telemetry.addData("Hub orientation", "Logo=%s   USB=%s\n ", logoDirection, usbDirection);
-        // Check to see if heading reset is requested
-        if (gamepad1.y) {
-            telemetry.addData("Yaw", "Resetting\n");
-            imu.resetYaw();
-        } else {
-            telemetry.addData("Yaw", "Press Y (triangle) on Gamepad to reset\n");
-        }
 
         waitForStart();
 
         while (opModeIsActive()) {
-
-           // Mecanumdrive();
-
-            // Retrieve Rotational Angles and Velocities
-            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
-            AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
-            telemetry.addData("Yaw (Z)", "%.2f Deg. (Heading)", orientation.getYaw(AngleUnit.DEGREES));
-            telemetry.addData("Pitch (X)", "%.2f Deg.", orientation.getPitch(AngleUnit.DEGREES));
-            telemetry.addData("Roll (Y)", "%.2f Deg.\n", orientation.getRoll(AngleUnit.DEGREES));
-            telemetry.addData("Yaw (Z) velocity", "%.2f Deg/Sec", angularVelocity.zRotationRate);
-            telemetry.addData("Pitch (X) velocity", "%.2f Deg/Sec", angularVelocity.xRotationRate);
-            telemetry.addData("Roll (Y) velocity", "%.2f Deg/Sec", angularVelocity.yRotationRate);
-            telemetry.update();
 
             /* servo open and close and positions */
 
@@ -344,43 +306,6 @@ public class TestOpMode extends LinearOpMode {
 
         }
     }
-
-          /*  if (rampUp) {
-                // Keep stepping up until we hit the max value.
-                power += INCREMENT;
-                if (power >= MAX_FWD) {
-                    power = MAX_FWD;
-                    rampUp = !rampUp;   // Switch ramp direction
-                }
-            } else {
-                // Keep stepping down until we hit the min value.
-                power -= INCREMENT;
-                if (power <= MAX_REV) {
-                    power = MAX_REV;
-                    rampUp = !rampUp;  // Switch ramp direction
-                }
-            }
-
-            if (gamepad1.x) {
-                Test.setPosition(0);
-            } else if (gamepad1.y || gamepad1.b) {
-                Test.setPosition(0.5);
-            } else if (gamepad1.a) {
-                Test.setPosition(1);
-            }
-
-            telemetry.addData("Motor Power", "%5.2f", power);
-            telemetry.addData(">", "Press Stop to end test.");
-            telemetry.update();
-
-            tEst.setPower(power);
-            sleep(CYCLE_MS);
-            idle();
-        }
-            tEst.setPower(0);
-            telemetry.addData(">", "Done");
-            telemetry.update();
-*/
 
 }
 

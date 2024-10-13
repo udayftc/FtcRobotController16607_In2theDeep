@@ -13,7 +13,6 @@ import TrcCommonLib.trclib.TrcTaskMgr;
 import TrcCommonLib.trclib.TrcTimer;
 import TrcCommonLib.trclib.TrcVisionTargetInfo;
 import teamcode.Robot;
-import teamcode.subsystems.BlinkinLEDs;
 import teamcode.vision.Vision;
 
 /**
@@ -222,11 +221,6 @@ public class TaskAutoPickupSample extends TrcAutoTask<TaskAutoPickupSample.State
                     {
                         // Timing out, moving on.
                         tracer.traceInfo(moduleName, "%s not found.", taskParams.sampleType);
-                        if (robot.blinkin != null)
-                        {
-                            // Tell the drivers vision doesn't see anything so they can score manually.
-                            robot.blinkin.setDetectedPattern(BlinkinLEDs.DETECTED_NOTHING);
-                        }
 
                         sm.setState(State.DONE);
                     }

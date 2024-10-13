@@ -5,18 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import java.util.Locale;
 
-import TrcCommonLib.command.CmdPidDrive;
-import TrcCommonLib.command.CmdTimedDrive;
 import TrcCommonLib.trclib.TrcDbgTrace;
-import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcTimer;
 import ftclib.FtcChoiceMenu;
-import ftclib.FtcMatchInfo;
 import ftclib.FtcMenu;
 import ftclib.FtcOpMode;
 import ftclib.FtcValueMenu;
-import teamcode.autocommands.CmdAuto;
 
 /**
  * This class contains the Autonomous Mode program. 
@@ -114,14 +109,6 @@ public class FtcAuto extends FtcOpMode
         //
         // Open trace log.
         //
-        if (RobotParams.Preferences.useTraceLog)
-        {
-            Robot.matchInfo = FtcMatchInfo.getMatchInfo();
-            String filePrefix = String.format(
-                Locale.US, "%s%02d_Auto", Robot.matchInfo.matchType, Robot.matchInfo.matchNumber);
-            TrcDbgTrace.openTraceLog(RobotParams.LOG_FOLDER_PATH, filePrefix);
-        }
-        //
         // Create and run choice menus.
         //
         doAutoChoicesMenus();
@@ -135,31 +122,6 @@ public class FtcAuto extends FtcOpMode
                 //
                 // Intentionally fall through to the next state.
                 //
-            case AUTO_SCORE_2:
-                if (RobotParams.Preferences.robotType != RobotParams.RobotType.NoRobot)
-                {
-                    autoCommand = new CmdAuto(robot, autoChoices);
-                }
-                break;
-
-            case PID_DRIVE:
-                if (RobotParams.Preferences.robotType != RobotParams.RobotType.NoRobot)
-                {
-                    autoCommand = new CmdPidDrive(
-                        robot.robotDrive.driveBase, robot.robotDrive.pidDrive, autoChoices.delay,
-                        autoChoices.drivePower, null,
-                        new TrcPose2D(autoChoices.xTarget*12.0, autoChoices.yTarget*12.0, autoChoices.turnTarget));
-                }
-                break;
-
-            case TIMED_DRIVE:
-                if (RobotParams.Preferences.robotType != RobotParams.RobotType.NoRobot)
-                {
-                    autoCommand = new CmdTimedDrive(
-                        robot.robotDrive.driveBase, autoChoices.delay, autoChoices.driveTime,
-                        0.0, autoChoices.drivePower, 0.0);
-                }
-                break;
 
             case DO_NOTHING:
             default:
@@ -226,10 +188,6 @@ public class FtcAuto extends FtcOpMode
         }
         robot.globalTracer.traceInfo(
             moduleName, "***** Starting autonomous: " + TrcTimer.getCurrentTimeString() + " *****");
-        if (Robot.matchInfo != null)
-        {
-            robot.globalTracer.logInfo(moduleName, "MatchInfo", Robot.matchInfo.toString());
-        }
         robot.globalTracer.logInfo(moduleName, "AutoChoices", autoChoices.toString());
         robot.dashboard.clearDisplay();
         //
@@ -248,10 +206,6 @@ public class FtcAuto extends FtcOpMode
             robot.vision.setAprilTagVisionEnabled(true);
         }
 
-        if (robot.battery != null)
-        {
-            robot.battery.setEnabled(true);
-        }
     }   //startMode
 
     /**
@@ -275,11 +229,6 @@ public class FtcAuto extends FtcOpMode
         // Tell robot object opmode is about to stop so it can do the necessary cleanup for the mode.
         //
         robot.stopMode(prevMode);
-
-        if (robot.battery != null)
-        {
-            robot.battery.setEnabled(false);
-        }
 
         printPerformanceMetrics();
         robot.globalTracer.traceInfo(

@@ -9,18 +9,10 @@ import TrcCommonLib.trclib.TrcPose2D;
 import TrcCommonLib.trclib.TrcRobot;
 import TrcCommonLib.trclib.TrcServo;
 import TrcCommonLib.trclib.TrcTimer;
-import TrcCommonLib.trclib.TrcUtil;
 import ftclib.FtcDashboard;
-import ftclib.FtcDcMotor;
-import ftclib.FtcMatchInfo;
 import ftclib.FtcOpMode;
-import ftclib.FtcRobotBattery;
-import ftclib.FtcMatchInfo;
 import teamcode.autotasks.TaskAutoPlaceSample;
-import teamcode.drivebases.MecanumDrive;
 import teamcode.drivebases.RobotDrive;
-import teamcode.drivebases.SwerveDrive;
-import teamcode.subsystems.BlinkinLEDs;
 import teamcode.subsystems.ElevatorArm;
 import teamcode.subsystems.Intake;
 import teamcode.subsystems.SampleTray;
@@ -39,7 +31,6 @@ public class Robot
     public final FtcOpMode opMode;
     public final TrcDbgTrace globalTracer;
     public final FtcDashboard dashboard;
-    public static FtcMatchInfo matchInfo = null;
     private static TrcPose2D endOfAutoRobotPose = null;
     private static double nextStatusUpdateTime = 0.0;
     //
@@ -47,11 +38,7 @@ public class Robot
     //
     public Vision vision;
     //
-    // Sensors and indicators.
-    //
-    public BlinkinLEDs blinkin;
-    public FtcRobotBattery battery;
-    //
+    // Sensors and indicators./
     // Subsystems.
     //
     public RobotDrive robotDrive;
@@ -97,21 +84,7 @@ public class Robot
             //
             // Create and initialize sensors and indicators.
             //
-            if (RobotParams.Preferences.useBlinkin)
-            {
-                blinkin = new BlinkinLEDs(RobotParams.HWNAME_BLINKIN);
-            }
 
-            if (RobotParams.Preferences.useBatteryMonitor)
-            {
-                battery = new FtcRobotBattery();
-            }
-            //
-            // Create and initialize RobotDrive.
-            //
-            robotDrive =
-                RobotParams.Preferences.robotType == RobotParams.RobotType.SwerveRobot?
-                    new SwerveDrive(): new MecanumDrive();
             //
             // Create and initialize other subsystems.
             //
@@ -130,22 +103,6 @@ public class Robot
                 if (RobotParams.Preferences.useIntake)
                 {
                     intake = new Intake(RobotParams.HWNAME_INTAKE);
-                }
-
-                if (RobotParams.Preferences.useSampleTray)
-                {
-                    sampleTray = new SampleTray(RobotParams.HWNAME_SAMPLETRAY);
-                    // Code review: Should this init be in Robot.startMode?
-                    if (runMode == TrcRobot.RunMode.TELEOP_MODE)
-                    {
-                        sampleTray.setUpperGateOpened(true, null);
-                        sampleTray.setLowerGateOpened(true, null);
-                    }
-                    else
-                    {
-                        sampleTray.setUpperGateOpened(false, null);
-                        sampleTray.setLowerGateOpened(false, null);
-                    }
                 }
 
                 //
@@ -182,14 +139,6 @@ public class Robot
             //
             // Since the IMU gyro is giving us cardinal heading, we need to enable its cardinal to cartesian converter.
             //
-            if (robotDrive.gyro != null)
-            {
-                robotDrive.gyro.setEnabled(true);
-                // The following are performance counters, could be disabled for competition if you want.
-                // But it might give you some insight if somehow autonomous wasn't performing as expected.
-                robotDrive.gyro.setElapsedTimerEnabled(true);
-            }
-            //
             // Enable odometry for all opmodes. We may need odometry in TeleOp for auto-assist drive.
             //
             robotDrive.driveBase.setOdometryEnabled(true);
@@ -220,12 +169,7 @@ public class Robot
     {
         //
         // Print all performance counters if there are any.
-        //
-        if (robotDrive != null && robotDrive.gyro != null)
-        {
-            robotDrive.gyro.printElapsedTime(globalTracer);
-            robotDrive.gyro.setElapsedTimerEnabled(false);
-        }
+
         TrcDigitalInput.printElapsedTime(globalTracer);
         TrcDigitalInput.setElapsedTimerEnabled(false);
         TrcMotor.printElapsedTime(globalTracer);
@@ -249,12 +193,6 @@ public class Robot
                 vision.setAprilTagVisionEnabled(false);
             }
 
-            if (vision.yellowSampleVision != null)
-            {
-                globalTracer.traceInfo(moduleName, "Disabling YellowPixelVision.");
-                vision.setSampleVisionEnabled(Vision.SampleType.YellowSample, false);
-            }
-
             if (vision.redBlobVision != null)
             {
                 globalTracer.traceInfo(moduleName, "Disabling RedBlobVision.");
@@ -265,12 +203,6 @@ public class Robot
             {
                 globalTracer.traceInfo(moduleName, "Disabling BlueBlobVision.");
                 vision.setBlueBlobVisionEnabled(false);
-            }
-
-            if (vision.tensorFlowVision != null)
-            {
-                globalTracer.traceInfo(moduleName, "Disabling TensorFlowVision.");
-                vision.setTensorFlowVisionEnabled(false);
             }
        }
 
@@ -289,10 +221,6 @@ public class Robot
             //
             // Disable gyro task.
             //
-            if (robotDrive.gyro != null)
-            {
-                robotDrive.gyro.setEnabled(false);
-            }
         }
     }   //stopMode
 
@@ -348,13 +276,6 @@ public class Robot
             {
                 dashboard.displayPrintf(
                     lineNum++, "Intake: power=%.1f", intake.getIntakeMotor().getPower());
-            }
-
-            if (sampleTray != null)
-            {
-                dashboard.displayPrintf(
-                    lineNum++, "SAMPLETray: lowerGateOpened=%s, upperGateOpened=%s",
-                    sampleTray.isLowerGateOpened(), sampleTray.isUpperGateOpened());
             }
         }
     }   //updateStatus

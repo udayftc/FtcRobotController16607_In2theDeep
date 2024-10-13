@@ -14,7 +14,6 @@ import ftclib.FtcVisionAprilTag;
 import teamcode.FtcAuto;
 import teamcode.Robot;
 import teamcode.RobotParams;
-import teamcode.subsystems.BlinkinLEDs;
 
 /**
  * This class implements auto-assist place pixel task.
@@ -317,11 +316,6 @@ public class TaskAutoPlaceSample extends TrcAutoTask<TaskAutoPlaceSample.State>
                         tracer.traceInfo(
                             moduleName, "Drive to AprilTag %d using absolute odometry (pose=%s).",
                             targetAprilTagId, aprilTagPose);
-                    }
-                    else if (robot.blinkin != null)
-                    {
-                        // Tell the drivers vision doesn't see anything so they can score manually.
-                        robot.blinkin.setDetectedPattern(BlinkinLEDs.DETECTED_NOTHING);
                     }
                 }
 

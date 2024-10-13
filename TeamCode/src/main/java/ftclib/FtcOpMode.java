@@ -273,7 +273,6 @@ public abstract class FtcOpMode extends LinearOpMode implements TrcRobot.RobotMo
         TrcRobot.RunMode runMode;
         //
         // Determine run mode. Note that it means the OpMode must be annotated with group="FtcAuto", group="FtcTeleOp"
-        // or group="FtcTest".
         //
         opModeName = getOpmodeTypeName(Autonomous.class);
         if (opModeName != null)
