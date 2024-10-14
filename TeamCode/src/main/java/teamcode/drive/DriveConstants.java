@@ -45,7 +45,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 1.8898; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 13; // in
+    public static double TRACK_WIDTH = 15.5; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -65,6 +65,7 @@ public class DriveConstants {
      * inches.
      */
     /*
+     * Note from LearnRoadRunner.com:
      * The velocity and acceleration constraints were calculated based on the following equation:
      * ((MAX_RPM / 60) * GEAR_RATIO * WHEEL_RADIUS * 2 * Math.PI) * 0.85
      * Resulting in 73.17330064499293 in/s.
@@ -82,13 +83,11 @@ public class DriveConstants {
      *
      * Maximum Angular Velocity is calculated as: maximum velocity / trackWidth * (180 / Math.PI) but capped at 360°/s.
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
-
      */
     public static double MAX_VEL = 73.17330064499293;
     public static double MAX_ACCEL = 73.17330064499293;
-    public static double MAX_ANG_VEL = Math.toRadians(322.50163846153845);
-    public static double MAX_ANG_ACCEL = Math.toRadians(322.50163846153845);
-
+    public static double MAX_ANG_VEL = Math.toRadians(270.4852451612903);
+    public static double MAX_ANG_ACCEL = Math.toRadians(270.4852451612903);
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;
